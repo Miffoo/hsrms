@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TSBR</title>
+
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #dff0d8;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 800px;
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #3c763d;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      background-color: #3c763d;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #2e6b2f;
+    }
+    .result-card {
+      display: none;
+      margin-top: 30px;
+    }
+    .card-title {
+      color: #3c763d;
+    }
+    .developer-credit {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #3c763d;
+      font-style: italic;
+      font-family: "Georgia", serif;
+    }
+  </style>
+  
+  <style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+  
+  
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Student Behaviour Reporting</h1>
+
+
+<div class="form-group">
+  <label for="date">Date:</label>
+  <input type="date" class="form-control" id="date">
+</div>
+
+
+
+        <div class="form-group">
+            <label for="classes">Classes:</label>
+            <input list="class-options" id="classes" class="form-control" onchange="loadStudents()">
+            <datalist id="class-options">
+                <!-- Options will be dynamically loaded -->
+            </datalist>
+        </div>
+		<div class="form-group">
+			<label for="students">Students:</label>
+				<div class="input-group">
+					<input list="student-options" id="students" class="form-control">
+						<datalist id="student-options">
+							<!-- Options will be dynamically loaded -->
+						</datalist>
+					
+				</div>
+
+		</div>
+
+<input type="hidden" id="sid">
+<input type="hidden" id="sname">
+
+<div class="form-group">
+  <label for="nid">NID:</label>
+  <input type="text" class="form-control" id="nid" readonly>
+</div>
+
+<div class="form-group">
+  <label for="staffName">Staff Name:</label>
+  <input type="text" class="form-control" id="staffName" readonly>
+</div>
+
+<div class="form-group">
+  <label for="issue">Select or Enter Behavior Issue:</label>
+  <input list="issueOptions" id="issue" name="issue" class="form-control" required placeholder="Select or type behavior issue">
+  <datalist id="issueOptions">
+    <option value="Talking back to teachers">
+    <option value="Ignoring instructions or refusing to comply">
+    <option value="Rolling eyes, making rude gestures, or mocking">
+    <option value="Constant talking or interrupting lessons">
+    <option value="Making loud noises or distracting others">
+    <option value="Moving around the class without permission">
+    <option value="Fighting or physical aggression">
+    <option value="Physical violence on teachers">	
+    <option value="Pushing, hitting, or throwing objects">
+    <option value="Threatening or intimidating other students">
+    <option value="Threatening or intimidating teachers">
+    <option value="Name-calling, teasing, or spreading rumors">
+    <option value="Targeting students based on skin color, or disability">
+    <option value="Copying homework or test answers">
+    <option value="Lying to avoid consequences">
+    <option value="Forging signatures on notes or reports">
+    <option value="Damaging school property (vandalism)">
+    <option value="Stealing from other students or classrooms">
+    <option value="Swearing or using offensive slang">
+    <option value="Making inappropriate jokes or comments">
+    <option value="Gesturing in a vulgar or disrespectful way">
+    <option value="Smoking or vaping on school grounds">
+    <option value="Using or possessing drugs ^(-_-)^">
+    <option value="Frequently skipping class">
+    <option value="Leaving school without permission">
+    <option value="Hiding in bathrooms or out-of-bound areas">
+    <option value="Using phones or other unrelated items to school">
+  </datalist>
+</div>
+
+
+
+<div class="form-group">
+  <label for="actionTaken">Action Taken:</label>
+  <textarea class="form-control" id="actionTaken" rows="3" required></textarea>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="informedLT" onchange="toggleLTName()">
+  <label class="form-check-label" for="informedLT">Informed LT</label>
+</div>
+
+<div class="form-group" id="ltNameGroup" style="display:none;">
+  <label for="ltName">Informed LT Name:</label>
+  <select class="form-control" id="ltName">
+    <option value="">-- Select --</option>
+  </select>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="informedClassteacher">
+  <label class="form-check-label" for="informedClassteacher">Informed Class Teacher</label>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="informedParent">
+  <label class="form-check-label" for="informedParent">Informed Parent</label>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="dFormFilled" onchange="toggleDFormUpload()">
+  <label class="form-check-label" for="dFormFilled">D Form Filled</label>
+</div>
+
+<div class="form-group" id="dFormGroup" style="display:none;">
+  <label for="dFormFile">Upload D Form:</label>
+  <input type="file" class="form-control" id="dFormFile" accept="image/*">
+</div>
+
+
+
+		<div class="mt-2">
+    <button id="submitBtn" class="btn btn-primary w-100" onclick="submitBehavior(event)">Submit</button>
+	</div>
+	
+	<div class="mt-2">
+<button class="btn btn-secondary w-100" onclick="clearForm()">Clear</button>
+	</div>
+	<div class="mt-2">
+      <button type="button" class="btn btn-danger w-100" onclick="navigateWithFade('teachers_landing_page.html')">Back</button>
+	  	</div>
+
+
+
+<div class="container mt-4">
+
+<input type="hidden" id="editingRecordId">
+
+
+
+
+  <h2 class="text-center">Your Submissions</h2>
+  <div class="table-responsive">
+<table class="table table-bordered table-hover text-center align-middle" id="recordsTable">
+  <thead class="table-success">
+    <tr>
+      <th style="display:none; vertical-align: middle;">Record ID</th>
+      <th style="vertical-align: middle;">Date</th>
+      <th style="vertical-align: middle;">Class</th>
+      <th style="vertical-align: middle;">Student Name</th>
+      <th style="vertical-align: middle;">D Form Filled</th>
+      <th style="vertical-align: middle;">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="recordsBody">
+    <!-- Records will be populated dynamically -->
+  </tbody>
+</table>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+  </div>
+    <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+<script>
+
+
+
+
+
+const phoneNumber = localStorage.getItem('phoneNumber'); // Retrieve the phone number
+
+const teacherScriptUrl = 'https://script.google.com/macros/s/AKfycbyqv1AJXS2gggrPUt82AMLVqpQsoa4fLwiQHb5OgiqkSrGdBxkjkr7R6aHyCCPkXINV/exec';
+const classStudentScriptUrl = 'https://script.google.com/macros/s/AKfycbzegnGbhZtUxqycRTeLbjcjrBkYJY5Pe-s-KnZVAvp8rjZ_Etn-5MuEea0O_2B0jCMV/exec';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const phoneNumber = localStorage.getItem('phoneNumber');
+  if (phoneNumber) {
+    document.getElementById('nid').value = phoneNumber;
+loadGrid();
+  } else {
+    console.warn('No phone number found in local storage.');
+  }
+
+  loadClasses();
+recallUserName();
+loadSMTNames();
+
+});
+
+const classScriptUrl = "https://script.google.com/macros/s/AKfycbyCP9RRaEOLXQL8diuejhiCF3Py083hQ9gL0ez4pPHC4fa36p9DeGhBeMn1F7m2VrWG/exec";
+
+function loadClasses() {
+  const phoneNumber = localStorage.getItem('phoneNumber');
+
+  fetch(`${classScriptUrl}?action=getClasses&phoneNumber=${encodeURIComponent(phoneNumber)}`)
+
+    .then(response => response.json())
+    .then(data => {
+      const classList = data.classes.slice(1); // Skip "Class" dummy
+      populateClassOptions(classList);
+    })
+    .catch(error => console.error('Error fetching classes:', error));
+}
+
+
+function populateClassOptions(classes) {
+  const classOptions = document.getElementById('class-options');
+  classOptions.innerHTML = ''; // Clear previous options
+
+  if (classes.length === 0) {
+    const option = document.createElement('option');
+    option.value = "No assigned classes";
+    classOptions.appendChild(option);
+  } else {
+    classes.forEach(className => {
+      const option = document.createElement('option');
+      option.value = className;
+      classOptions.appendChild(option);
+    });
+  }
+}
+
+
+
+function loadStudents() {
+    const className = document.getElementById('classes').value;
+    const studentInput = document.getElementById('students');
+    const studentOptions = document.getElementById('student-options');
+
+    if (!className) {
+        studentOptions.innerHTML = ''; // Clear options if no class selected
+		        studentInput.value = ''; // Clear the student input field
+        studentInput.style.backgroundColor = ''; // Reset background color
+        return;
+    }
+
+    studentInput.style.backgroundColor = 'lightcoral'; // Set loading indicator
+
+    fetch(`${classStudentScriptUrl}?action=getStudents&class=${encodeURIComponent(className)}`)
+        .then(response => response.json())
+        .then(data => {
+            studentOptions.innerHTML = ''; // Clear previous options
+            data.students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = `${student.SID} ${student.name}`; // Combine SID and name
+                studentOptions.appendChild(option);
+            });
+
+            studentInput.style.backgroundColor = 'lightgreen'; // Set success indicator
+        })
+        .catch(error => {
+            console.error('Error fetching students:', error);
+            studentInput.style.backgroundColor = ''; // Reset background on error
+        });
+}
+
+
+
+function recallUserName() {
+    const nid = localStorage.getItem('phoneNumber'); // or document.getElementById('nid').value;
+    if (!nid) {
+        console.warn('No NID found to recall staff name.');
+        return;
+    }
+
+    fetch(`https://script.google.com/macros/s/AKfycbxcif2M0iA6aZS3MB-XUNRg6ifXKFFCNhwly3llzuI-005QEv0BN3mfibBK4uTDvOu8/exec?action=getUserDetails&nid=${nid}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('staffName').value = data.name; // Set value, not innerText
+            } else {
+                console.error('Failed to get staff name:', data.message);
+            }
+        })
+        .catch(error => console.error('Error recalling user name:', error));
+}
+
+
+
+
+
+function loadSMTNames() {
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbwSoJbCylpHsxEnhH56Ag71GM6Gvcle2HuqjJHAXhUBaIW6uo1mgV7F_5ntAVq1J6Nu/exec';
+
+  fetch(`${scriptUrl}?action=getSMTNames`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const ltNameSelect = document.getElementById('ltName');
+        ltNameSelect.innerHTML = '<option value="">-- Select --</option>'; // Clear existing + default option
+        data.smtNames.forEach(name => {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          ltNameSelect.appendChild(option);
+        });
+      } else {
+        console.error('Failed to load SMT names:', data.message);
+      }
+    })
+    .catch(error => console.error('Error loading SMT names:', error));
+}
+
+
+
+
+
+
+</script>
+
+
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+
+
+<script>
+let submitInProgress = false;
+
+ document.addEventListener("DOMContentLoaded", () => {
+  const dateInput = document.getElementById("date");
+  if (!dateInput.value) {
+    const today = new Date();
+    const yyyyMmDd = today.toISOString().split("T")[0]; // e.g., "2025-06-15"
+    dateInput.value = yyyyMmDd;
+  }
+
+    const nid = localStorage.getItem("nid");
+    const name = localStorage.getItem("name");
+    if (nid) document.getElementById("nid").value = nid;
+    if (name) document.getElementById("staffName").value = name;
+
+  document.getElementById("students").addEventListener("change", () => {
+    const val = document.getElementById("students").value;
+    const parts = val.split(" "); // e.g., "HS1234567 John Doe"
+    const sid = parts[0]; // SID
+    const sname = parts.slice(1).join(" "); // Rest is student name
+    document.getElementById("sid").value = sid;
+    document.getElementById("sname").value = sname;
+  });
+});
+
+  function toggleDFormUpload() {
+    const checked = document.getElementById("dFormFilled").checked;
+    document.getElementById("dFormGroup").style.display = checked ? 'block' : 'none';
+  }
+
+function toggleLTName() {
+  const checked = document.getElementById("informedLT").checked;
+  document.getElementById("ltNameGroup").style.display = checked ? 'block' : 'none';
+}
+
+
+  function clearForm() {
+document.getElementById("classes").value = '';
+    document.getElementById("students").value = '';
+    document.getElementById("sid").value = '';
+    document.getElementById("sname").value = '';
+    document.getElementById("issue").value = '';
+    document.getElementById("actionTaken").value = '';
+    document.getElementById("informedLT").checked = false;
+    document.getElementById("ltName").value = '';
+    document.getElementById("informedClassteacher").checked = false;
+    document.getElementById("informedParent").checked = false;
+    document.getElementById("dFormFilled").checked = false;
+    document.getElementById("dFormFile").value = '';
+
+  const recordIdField = document.getElementById("recordId");
+  if (recordIdField) recordIdField.value = "";
+
+    toggleDFormUpload();
+  }
+
+function toggleLTName() {
+  const informedLT = document.getElementById('informedLT').checked;
+  const ltNameGroup = document.getElementById('ltNameGroup');
+  const ltName = document.getElementById('ltName');
+
+  if (informedLT) {
+    ltNameGroup.style.display = 'block';
+  } else {
+    ltNameGroup.style.display = 'none';
+    ltName.value = ''; // Clear the selection when unchecked
+  }
+}
+function submitBehavior(event) {
+  if (event) event.preventDefault();
+  if (submitInProgress) return;
+  submitInProgress = true;
+
+  const submitBtn = document.getElementById("submitBtn");
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Submitting...";
+  }
+
+
+  const sid = document.getElementById("sid").value.trim();
+  const studentName = document.getElementById("sname").value.trim();
+  const className = document.getElementById("classes").value.trim();
+  const nid = document.getElementById("nid").value.trim();
+  const staffName = document.getElementById("staffName").value.trim();
+  const issue = document.getElementById("issue").value.trim();
+  const action = document.getElementById("actionTaken").value.trim();
+  const informedLT = document.getElementById("informedLT").checked ? 'Yes' : 'No';
+  const ltName = document.getElementById("ltName").value.trim();
+  const informedClassTeacher = document.getElementById("informedClassteacher").checked ? 'Yes' : 'No';
+  const informedParent = document.getElementById("informedParent").checked ? 'Yes' : 'No';
+  const dFormFilled = document.getElementById("dFormFilled").checked ? 'Yes' : 'No';
+  const dFormFile = document.getElementById("dFormFile").files[0];
+
+  const recordId = document.getElementById("editingRecordId")?.value;
+
+
+  // 🔸 Required field check
+  if (!sid || !studentName || !className || !nid || !staffName || !issue || !action) {
+    alert("Please fill all required fields.");
+    resetSubmitButton();
+    return;
+  }
+
+  // 🔸 LT Name validation
+  if (informedLT === "Yes" && ltName === "") {
+    alert("Please select an LT name.");
+    resetSubmitButton();
+    return;
+  }
+
+  // 🔸 D Form file validation
+  if (dFormFilled === "Yes" && !dFormFile) {
+    alert("Please upload the D Form file.");
+    resetSubmitButton();
+    return;
+  }
+
+  const formData = {
+    date: document.getElementById("date").value,
+    sid,
+    studentName,
+    class: className,
+    nid,
+    staffName,
+    issue,
+    actionTaken: action,
+    informedLT,
+    ltName,
+    informedClassteacher: informedClassTeacher,
+    informedParent,
+    dFormFilled
+  };
+
+  const isEditing = !!recordId;
+  if (isEditing) formData.recordId = recordId;
+
+  const payload = new FormData();
+  payload.append("action", isEditing ? "update" : "submit");
+  payload.append("formData", JSON.stringify(formData));
+  payload.append("hasFile", dFormFilled === "Yes" && dFormFile ? "true" : "false");
+
+  if (dFormFilled === "Yes" && dFormFile) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const base64Data = event.target.result.split(',')[1];
+      payload.append("fileData", base64Data);
+      payload.append("mimeType", dFormFile.type);
+      payload.append("fileName", dFormFile.name);
+      sendForm(payload, isEditing);
+    };
+    reader.readAsDataURL(dFormFile);
+  } else {
+    sendForm(payload, isEditing);
+  }
+}
+
+// 🔁 Helper to reset button UI
+function resetSubmitButton() {
+  submitInProgress = false;
+  const submitBtn = document.getElementById("submitBtn");
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Submit";
+  }
+}
+
+function sendForm(data, isEditing) {
+
+  fetch("https://script.google.com/macros/s/AKfycbxR9ao9sNhxXjcUOns7WKNdAwNYMxDJWdC2qJd_z0CdNfjqa_0fAvZPAdHSq9_CLdIo/exec", {
+    method: "POST",
+    body: data
+  })
+    .then(res => res.json())
+    .then(result => {
+      submitInProgress = false;
+
+      const submitBtn = document.getElementById("submitBtn");
+      if (submitBtn) {
+        submitBtn.innerText = isEditing ? "Updated!" : "Submitted!";
+      }
+
+      if (result.status === "success") {
+        alert(isEditing ? "Record updated successfully." : "Submitted successfully.");
+         
+        if (typeof fetchUserRecords === "function") {
+          fetchUserRecords(document.getElementById("nid").value);
+        }
+        setTimeout(() => location.reload(), 1000); // Refresh page after 1s
+      } else {
+        alert("Submission failed: " + result.message);
+        resetSubmitButton();
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Submission failed due to a network error.");
+      resetSubmitButton();
+    });
+}
+
+
+
+</script>
+
+
+<script>
+
+
+function loadGrid() {
+  const nid = document.getElementById("nid").value;
+  if (!nid) return;
+
+  fetch("https://script.google.com/macros/s/AKfycbxR9ao9sNhxXjcUOns7WKNdAwNYMxDJWdC2qJd_z0CdNfjqa_0fAvZPAdHSq9_CLdIo/exec", {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "getUserRecords",
+      nid: nid
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      renderGrid(data.records);
+    } else {
+      console.error("Error loading records:", data.message);
+    }
+  });
+}
+function renderGrid(records) {
+  const tbody = document.getElementById("recordsBody");
+  tbody.innerHTML = "";
+
+  records.forEach(record => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td style="display:none;">${record.recordId}</td> <!-- Keep visible for testing -->
+      <td>${record.date}</td>
+      <td>${record.class}</td>
+      <td>${record.studentName}</td>
+	  <td>${record.dFormFilled}</td>
+	  
+	  
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="editRecordById('${record.recordId}')"> Edit </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRecordById('${record.recordId}')"> Delete </button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+
+
+
+
+
+
+function editRecordById(recordId) {
+console.log("Editing record ID:", recordId);
+  fetch("https://script.google.com/macros/s/AKfycbxR9ao9sNhxXjcUOns7WKNdAwNYMxDJWdC2qJd_z0CdNfjqa_0fAvZPAdHSq9_CLdIo/exec", {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "getRecordById",
+      recordId: recordId
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      const record = data.record;
+
+      // Populate form fields with the record data
+      document.getElementById("date").value = record[0];
+      document.getElementById("sid").value = record[1];
+      document.getElementById("students").value = record[2];
+      document.getElementById("sname").value = record[2];
+      document.getElementById("classes").value = record[3];
+      document.getElementById("nid").value = record[4];
+      document.getElementById("staffName").value = record[5];
+      document.getElementById("issue").value = record[6];
+      document.getElementById("actionTaken").value = record[7];
+      document.getElementById("informedLT").checked = record[8] === "Yes";
+      document.getElementById("ltName").value = record[9];
+      document.getElementById("informedClassteacher").checked = record[11] === "Yes";
+      document.getElementById("informedParent").checked = record[12] === "Yes";
+      document.getElementById("dFormFilled").checked = record[13] === "Yes";
+
+      // Show/hide LT and D Form sections based on state
+      toggleLTName();
+      toggleDFormUpload();
+
+  // Disable editable fields
+      document.getElementById("date").readOnly = true;
+      document.getElementById("classes").readOnly = true;
+      document.getElementById("students").readOnly = true;
+
+
+document.getElementById("editingRecordId").value = recordId;
+
+      // Update submit button
+      document.getElementById("submitBtn").innerText = "Update Record";
+
+    } else {
+      alert("Failed to load record.");
+    }
+  })
+  .catch(err => {
+    console.error("Error loading record:", err);
+  });
+}
+
+
+
+function deleteRecordById(recordId) {
+  if (!recordId) {
+    alert("Missing record ID.");
+    return;
+  }
+
+  if (confirm("Are you sure you want to delete this record?")) {
+    const formData = new URLSearchParams();
+    formData.append("action", "delete");
+    formData.append("recordId", recordId);
+
+    fetch("https://script.google.com/macros/s/AKfycbxR9ao9sNhxXjcUOns7WKNdAwNYMxDJWdC2qJd_z0CdNfjqa_0fAvZPAdHSq9_CLdIo/exec", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === "success") {
+        alert("✅ Record deleted successfully.");
+        setTimeout(() => location.reload(), 1000); // Reload after 1 second
+      } else {
+        alert("❌ Failed to delete: " + json.message);
+      }
+    })
+    .catch(error => {
+      console.error("Delete error:", error);
+      alert("❌ Network or server error.");
+    });
+  }
+}
+
+
+</script>
+
+
+<script>
+  function toggleOtherInput(select) {
+    const otherInputGroup = document.getElementById("otherIssueGroup");
+    if (select.value === "other") {
+      otherInputGroup.style.display = "block";
+      document.getElementById("otherIssue").setAttribute("required", "required");
+    } else {
+      otherInputGroup.style.display = "none";
+      document.getElementById("otherIssue").removeAttribute("required");
+    }
+  }
+</script>
+
+
+
+
+</body>
+</html>

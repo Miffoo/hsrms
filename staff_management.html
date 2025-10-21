@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+	<script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+	
+	
+	
+		<style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+	
+	<style>
+        body {
+            background-color: #dff0d8;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 5px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #3c763d;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #3c763d;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+        }
+        .btn-primary:hover {
+            background-color: #2e6b2f;
+        }
+        .btn-danger {
+            background-color: #d9534f;
+            border: none;
+            width: 50%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+        .btn-secondary {
+            background-color: #0275d8;
+            border: none;
+            width: 50%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .app-title {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 5px;
+            font-weight: bold;
+            font-family: "Georgia", serif;
+        }
+        .developer-credit {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 20px;
+            font-style: italic;
+            font-family: "Georgia", serif;
+        }
+
+        /* Adjust the size and alignment of the buttons */
+        .d-flex.gap-2 > * {
+            height: 40px; /* Uniform height */
+            font-size: 14px; /* Smaller font size for better alignment */
+        }
+
+        input[list], select.form-control {
+            padding: 0.375rem 0.75rem;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            height: 40px;
+        }
+
+        button.btn {
+            padding: 0 10px;
+            font-size: 14px;
+            line-height: 1;
+            height: 36px; /* Slightly smaller height for buttons */
+            white-space: nowrap;
+        }
+
+        .btn-success {
+            background-color: #5cb85c;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #4cae4c;
+        }
+
+        .btn-secondary {
+            background-color: #0275d8;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #025aa5;
+        }
+
+        .btn-danger {
+            background-color: #d9534f;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+		
+		.btn-fixed-width {
+    width: 100px;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Teacher Management</h1>
+
+        <div class="form-group" hidden>
+            <label for="supervisorNID">Supervisor NID:</label>
+            <label id="supervisorNID" class="form-control" readonly></label>
+        </div>
+
+        <div class="form-group">
+            <label for="supervisorName">Supervisor Name:</label>
+            <label id="supervisorName" class="form-control" readonly></label>
+        </div>
+
+        <div class="form-group">
+            <label for="staffDropdown">Assigned Staffs:</label>
+            <select id="staffDropdown" class="form-control" onchange="updateStaffDetails()">
+                <option value="">-- Select Staff --</option>
+                <!-- Dynamically populated -->
+            </select>
+        </div>
+
+        <div class="form-group" hidden>
+            <label for="staffNID">Staff NID:</label>
+            <label id="staffNID" class="form-control" readonly></label>
+        </div>
+
+        <!-- Class Teacher Inputs -->
+        <div class="form-group">
+            <label for="classTeacherText">Class Teacher:</label>
+            <div class="d-flex gap-2 align-items-center">
+                <input list="classOptions" id="classTeacherText" class="form-control" readonly>
+                <button type="button" id="addclassTeacherBtn" class="btn btn-secondary btn-sm btn-fixed-width" onclick="toggleClassInput('classTeacher')">Add Class</button>
+                <button type="button" id="saveclassTeacherBtn" class="btn btn-success btn-sm btn-fixed-width" style="display: none;" onclick="saveClass('classTeacher')">Save Class</button>
+            </div>
+        </div>
+
+        <!-- Assistant Class Teacher Inputs -->
+        <div class="form-group">
+            <label for="assistantClassTeacherText">Assistant Class Teacher:</label>
+            <div class="d-flex gap-2 align-items-center">
+                <input list="classOptions" id="assistantClassTeacherText" class="form-control" readonly>
+                <button type="button" id="addassistantClassTeacherBtn" class="btn btn-secondary btn-sm btn-fixed-width" onclick="toggleClassInput('assistantClassTeacher')">Add Class</button>
+                <button type="button" id="saveassistantClassTeacherBtn" class="btn btn-success btn-sm btn-fixed-width" style="display: none;" onclick="saveClass('assistantClassTeacher')">Save Class</button>
+            </div>
+        </div>
+
+        <!-- Subject Teacher Inputs -->
+        <div class="form-group">
+            <label for="subjectTeacherText">Teaching classes:</label>
+            <div class="d-flex gap-2 align-items-center">
+                <input list="classOptions" id="subjectTeacherText" class="form-control" style="display: none;">
+                <select id="subjectTeacherSelect" class="form-control" style="display: block;"></select>
+
+                <button type="button" id="addsubjectTeacherBtn" class="btn btn-secondary btn-sm btn-fixed-width" onclick="toggleClassInput('subjectTeacher')">Add Class</button>
+                <button type="button" id="savesubjectTeacherBtn" class="btn btn-success btn-sm btn-fixed-width" style="display: none;" onclick="saveClass('subjectTeacher')">Save Class</button>
+                <button type="button" id="deleteSubjectClassBtn" class="btn btn-danger btn-sm">Delete Class</button>
+            </div>
+        </div>
+
+        <button class="btn btn-secondary" style="width: 100%;" onclick="clearAttendanceForm()">Clear Selection</button>
+        <button class="btn btn-danger" style="width: 100%;" onclick="navigateWithFade('smt_landing_page.html')">Go Back</button>
+    </div>
+
+    <div class="developer-credit text-center my-4">Developed by: Mifthah Ahmed</div>
+
+    <datalist id="classOptions"></datalist>
+
+ <script>
+ 
+ let staffData = []; // Add this above or outside DOMContentLoaded
+ 
+ 
+document.addEventListener("DOMContentLoaded", () => {
+generateClassOptions();
+    const supervisorNID = localStorage.getItem("phoneNumber");
+    if (!supervisorNID) {
+        alert("Supervisor NID not found in local storage. Please log in again.");
+        return;
+    }
+
+    document.getElementById("supervisorNID").innerText = supervisorNID;
+
+    // Fetch supervisor name
+    fetch(`https://script.google.com/macros/s/AKfycbyo0TDxYk_8VIz4C5XU_VDBYaSbyQGs9fWVJBGeUKq2_kWCRTbt8_HBLTJqx21pGbsr/exec?action=getSupervisorDetails&supervisorNID=${supervisorNID}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("supervisorName").innerText = data.supervisorName;
+            } else {
+                document.getElementById("supervisorName").innerText = "Not Found";
+            }
+        });
+
+
+
+
+    // Fetch assigned staffs
+    fetch(`https://script.google.com/macros/s/AKfycbyo0TDxYk_8VIz4C5XU_VDBYaSbyQGs9fWVJBGeUKq2_kWCRTbt8_HBLTJqx21pGbsr/exec?action=getStaffsBySupervisor&supervisorNID=${supervisorNID}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const dropdown = document.getElementById("staffDropdown");
+                staffData = data.staffs; 
+				data.staffs.forEach(staff => {
+                    const option = document.createElement("option");
+                    option.value = staff.nid;
+                    option.text = staff.name;
+                    option.setAttribute("data-nid", staff.nid);
+                    dropdown.appendChild(option);
+                });
+            }
+        });
+});
+
+function updateStaffDetails() {
+
+    const selectedNID = document.getElementById("staffDropdown").value;
+    if (!selectedNID) {
+	
+	        // Clear all related fields
+        document.getElementById("staffNID").innerText = "";
+        document.getElementById("classTeacherText").value = "";
+        document.getElementById("assistantClassTeacherText").value = "";
+        document.getElementById("subjectTeacherText").value = "";
+		document.getElementById("subjectTeacherSelect").innerHTML = "";
+	
+	
+	
+	return;
+}
+    document.getElementById("staffNID").innerText = selectedNID;
+
+    const selectedStaff = staffData.find(staff => staff.nid === selectedNID);
+
+    if (!selectedStaff) return;
+
+    document.getElementById("classTeacherText").value = selectedStaff.classTeacher || "";
+    document.getElementById("assistantClassTeacherText").value = selectedStaff.assistantTeacher || "";
+    document.getElementById("subjectTeacherText").value = selectedStaff.subjectTeacher || "";
+
+  // Hide subjectTeacherText, show subjectTeacherSelect
+  document.getElementById("subjectTeacherText").style.display = "none";
+  document.getElementById("subjectTeacherSelect").style.display = "block";
+
+
+  // Populate new dropdown
+  const select = document.getElementById("subjectTeacherSelect");
+  select.innerHTML = "";
+  const classes = (selectedStaff.subjectTeacher || "").split(",").map(c => c.trim()).filter(Boolean);
+  classes.forEach(cls => {
+    const option = document.createElement("option");
+    option.value = cls;
+    option.textContent = cls;
+    select.appendChild(option);
+  });
+
+
+}
+
+
+function clearAttendanceForm() {
+  document.getElementById('staffDropdown').value = '';
+  document.getElementById('staffNID').innerText = '';
+
+  // Clear text inputs
+  document.getElementById('classTeacherText').value = '';
+  document.getElementById('assistantClassTeacherText').value = '';
+  document.getElementById('subjectTeacherText').value = '';
+
+  // Clear subject teacher select dropdown
+  const subjectSelect = document.getElementById('subjectTeacherSelect');
+  subjectSelect.innerHTML = '';
+
+  // Reset visibility
+  document.getElementById('subjectTeacherSelect').style.display = 'block';
+  document.getElementById('subjectTeacherText').style.display = 'none';
+
+  // Reset buttons
+  document.getElementById('addclassTeacherBtn').style.display = 'inline-block';
+  document.getElementById('saveclassTeacherBtn').style.display = 'none';
+
+  document.getElementById('addassistantClassTeacherBtn').style.display = 'inline-block';
+  document.getElementById('saveassistantClassTeacherBtn').style.display = 'none';
+
+  document.getElementById('addsubjectTeacherBtn').style.display = 'inline-block';
+  document.getElementById('savesubjectTeacherBtn').style.display = 'none';
+
+  // Disable delete button for subject teacher
+  document.getElementById('deleteSubjectClassBtn').disabled = false;
+
+  // Reload staff list with updated data
+  const supervisorNID = localStorage.getItem("phoneNumber");
+  if (!supervisorNID) return;
+
+  const dropdown = document.getElementById("staffDropdown");
+  dropdown.innerHTML = '<option value="">-- Select Staff --</option>';
+
+  fetch(`https://script.google.com/macros/s/AKfycbyo0TDxYk_8VIz4C5XU_VDBYaSbyQGs9fWVJBGeUKq2_kWCRTbt8_HBLTJqx21pGbsr/exec?action=getStaffsBySupervisor&supervisorNID=${supervisorNID}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.staffs) {
+        staffData = data.staffs; // global variable used elsewhere
+        data.staffs.forEach(staff => {
+          const option = document.createElement("option");
+          option.value = staff.nid;
+          option.text = staff.name;
+          option.setAttribute("data-nid", staff.nid);
+          dropdown.appendChild(option);
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Failed to reload staff list:", error);
+    });
+}
+
+
+
+
+
+document.getElementById("deleteSubjectClassBtn").addEventListener("click", () => {
+  const nid = document.getElementById("staffNID").innerText;
+  const selectedClass = document.getElementById("subjectTeacherSelect").value;
+
+  if (!nid) {
+    alert("Please select a staff member first.");
+    return;
+  }
+
+  if (!selectedClass) {
+    alert("Please select a class to delete.");
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to remove "${selectedClass}" from subject teacher classes?`)) return;
+
+  fetch("https://script.google.com/macros/s/AKfycbyo0TDxYk_8VIz4C5XU_VDBYaSbyQGs9fWVJBGeUKq2_kWCRTbt8_HBLTJqx21pGbsr/exec", {
+    method: "POST",
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      action: "removeSubjectClass",
+      nid: nid,
+      field: "subjectTeacher",
+      value: selectedClass
+    })
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.success) {
+      alert(`Class "${selectedClass}" removed.`);
+
+      // 🔁 Fetch updated data, then refresh display
+      const supervisorNID = localStorage.getItem("phoneNumber");
+      fetch(`https://script.google.com/macros/s/AKfycbyo0TDxYk_8VIz4C5XU_VDBYaSbyQGs9fWVJBGeUKq2_kWCRTbt8_HBLTJqx21pGbsr/exec?action=getStaffsBySupervisor&supervisorNID=${supervisorNID}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            staffData = data.staffs;
+            updateStaffDetails();
+          }
+        });
+
+    } else {
+      alert("Failed to remove class: " + (response.message || "Unknown error"));
+    }
+  });
+});
+
+
+
+
+</script>
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+
+<script>
+function toggleClassInput(role) {
+  const input = document.getElementById(`${role}Text`);
+  const select = document.getElementById(`${role}Select`);
+  const addBtn = document.getElementById(`add${role}Btn`);
+  const saveBtn = document.getElementById(`save${role}Btn`);
+
+  // Clear the input for subjectTeacher
+  if (role === "subjectTeacher") {
+    input.value = ""; // <-- This line clears the input box
+  }
+
+  // Make input editable and visible
+  input.removeAttribute("readonly");
+  input.style.display = "block";
+
+  // Hide select dropdown if it exists (for subjectTeacher)
+  if (select) {
+    select.style.display = "none";
+  }
+
+  // Hide add button, show save button
+  addBtn.style.display = "none";
+  saveBtn.style.display = "inline-block";
+
+  // Disable delete button for subjectTeacher
+  if (role === "subjectTeacher") {
+    document.getElementById("deleteSubjectClassBtn").disabled = true;
+  }
+
+  input.focus();
+}
+
+
+
+
+
+
+
+
+</script>
+
+
+
+<script>
+const allClasses = [];
+
+function generateClassOptions() {
+      const datalist = document.getElementById("classOptions");
+      datalist.innerHTML = "";
+      const allClasses = [];
+
+      for (let grade = 1; grade <= 7; grade++) {
+        for (let code = 65; code <= 90; code++) {
+          allClasses.push(`${grade}${String.fromCharCode(code)}`);
+        }
+      }
+
+      for (let code = 65; code <= 90; code++) {
+        allClasses.push(`8${String.fromCharCode(code)}`);
+      }
+
+      ["8S", "8B", "9S", "9B", "10S", "10B"].forEach(prefix => {
+        for (let i = 1; i <= 7; i++) {
+          allClasses.push(`${prefix}${i}`);
+        }
+      });
+
+      allClasses.forEach(cls => {
+        const option = document.createElement("option");
+        option.value = cls;
+        datalist.appendChild(option);
+      });
+
+      window.validClasses = allClasses;
+    }
+
+
+
+
+
+function populateDropdown(type, options) {
+  const dropdown = document.getElementById(`${type}Dropdown`);
+  dropdown.innerHTML = "";
+  options.forEach(cls => {
+    const option = document.createElement("option");
+    option.value = cls;
+    option.textContent = cls;
+    dropdown.appendChild(option);
+  });
+}
+
+function filterClassOptions(type) {
+  const input = document.getElementById(`${type}Text`);
+  const dropdown = document.getElementById(`${type}Dropdown`);
+  const filter = input.value.toUpperCase();
+  const filteredOptions = allClasses.filter(cls => cls.includes(filter));
+
+  populateDropdown(type, filteredOptions);
+  dropdown.style.display = "block";
+}
+
+function selectClass(type) {
+  const dropdown = document.getElementById(`${type}Dropdown`);
+  const selectedValue = dropdown.value;
+  document.getElementById(`${type}Text`).value = selectedValue;
+}
+
+function saveClass(type) {
+  const textBox = document.getElementById(`${type}Text`);
+  const enteredValue = textBox.value.toUpperCase();
+  const isValid = allClasses.includes(enteredValue);
+
+  if (!isValid) {
+    alert(`Invalid class "${enteredValue}". Please select a valid class.`);
+    textBox.focus();
+    return;
+  }
+
+  // You can handle saving here (e.g., store to DB or state)
+  alert(`Saved class: ${enteredValue}`);
+}
+function saveClass(role) {
+  const input = document.getElementById(`${role}Text`);
+  const value = input.value.trim().toUpperCase();
+
+  if (!window.validClasses.includes(value)) {
+    alert(`"${value}" is not a valid class.`);
+    return;
+  }
+
+  const nid = document.getElementById("staffNID").innerText;
+  if (!nid) {
+    alert("Staff NID not found.");
+    return;
+  }
+
+  const field = role === 'assistantClassTeacher' ? 'assistantTeacher' :
+                role === 'subjectTeacher' ? 'subjectTeacher' : 'classTeacher';
+
+  fetch("https://script.google.com/macros/s/AKfycbyo0TDxYk_8VIz4C5XU_VDBYaSbyQGs9fWVJBGeUKq2_kWCRTbt8_HBLTJqx21pGbsr/exec", {
+    method: "POST",
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      action: "updateUserInfo",
+      nid: nid,
+      field: field,
+      value: value
+    })
+  })
+  .then(res => res.json())
+  .then(response => {
+    if (response.success) {
+      input.readOnly = true;
+      document.getElementById(`add${role}Btn`).style.display = 'inline-block';
+      document.getElementById(`save${role}Btn`).style.display = 'none';
+
+      if (role === 'subjectTeacher') {
+        // Update dropdown UI
+        document.getElementById("subjectTeacherSelect").style.display = "block";
+        document.getElementById("deleteSubjectClassBtn").disabled = false;
+
+        // Add new class to select dropdown
+        const select = document.getElementById("subjectTeacherSelect");
+        const existing = Array.from(select.options).map(opt => opt.value);
+        if (!existing.includes(value)) {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = value;
+          select.appendChild(option);
+        }
+
+        input.value = existing.concat(value).filter((v, i, a) => a.indexOf(v) === i).join(', ');
+        input.style.display = "none"; // Hide text input again
+      }
+    } else {
+      alert("Save failed: " + (response.message || "Unknown error"));
+    }
+  });
+}
+
+
+
+
+</script>
+
+
+
+
+
+
+
+</body>
+</html>
+

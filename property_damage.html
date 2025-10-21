@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Property Damage Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #e0f7fa, #e8f5e9);
+      padding: 30px;
+    }
+    .container {
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 30px;
+      max-width: 800px;
+      margin: auto;
+    }
+    h5 {
+      color: #2e7d32;
+      font-weight: 600;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+    .form-group label {
+      font-weight: 600;
+    }
+    input, select, button {
+      border-radius: 8px;
+    }
+    .btn-primary {
+      background-color: #2e7d32;
+      border-color: #2e7d32;
+    }
+    .btn-primary:hover {
+      background-color: #256029;
+    }
+    .btn-secondary {
+      background-color: #0275d8;
+      border-color: #0275d8;
+    }
+    .btn-secondary:hover {
+      background-color: #025aa5;
+    }
+    .btn-danger {
+      background-color: #d32f2f;
+      border-color: #d32f2f;
+    }
+    .btn-danger:hover {
+      background-color: #b71c1c;
+    }
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+    }
+    table th, table td {
+      padding: 12px;
+      border: 1px solid #dee2e6;
+    }
+    table th {
+      background-color: #f1f8e9;
+      font-weight: 600;
+    }
+    #preview img {
+      max-width: 100px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .is-invalid {
+      border-color: #dc3545;
+    }
+	
+	        h1 {
+            text-align: center;
+            color: #3c763d;
+        }
+	
+
+#reportGrid th, #reportGrid td {
+  font-size: 12px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 4px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: #e74c3c;
+  transform: scale(1.1);
+  box-shadow: 0 0 8px #e74c3c;
+}
+
+/* Cross lines inside the button */
+.remove-btn::before,
+.remove-btn::after {
+  content: "";
+  position: absolute;
+  width: 12px;
+  height: 2px;
+  background-color: white;
+  border-radius: 1px;
+}
+
+.remove-btn::before {
+  transform: rotate(45deg);
+}
+
+.remove-btn::after {
+  transform: rotate(-45deg);
+}
+
+        .developer-credit {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 20px;
+            font-style: italic;
+            font-family: "Georgia", serif;
+        }
+
+
+@keyframes fillProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+#modalImage {
+  max-width: 100%;
+  max-height: 80vh;
+}
+  </style>
+  
+  
+  <style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+  
+  
+</head>
+<body>
+
+<div class="container">
+  <h1><center>Property Damage Report</center></h1>
+
+<!-- Toggle View Panel Button -->
+<div class="text-center my-3">
+  <button id="toggleViewPanel" class="btn btn-outline-info">View panel</button>
+</div>
+
+
+
+
+  <form id="reportForm">
+    <div class="form-group mb-3">
+      <label for="date">Date</label>
+      <input type="date" id="date" class="form-control" required>
+    </div>
+    <div class="form-group mb-3">
+      <label for="nid">Reported Staff NID</label>
+      <input type="text" id="nid" class="form-control" readonly>
+    </div>
+    <div class="form-group mb-3">
+      <label for="name">Reported Staff Name</label>
+      <input type="text" id="name" class="form-control" readonly>
+    </div>
+<div class="form-group mb-3">
+  <label for="location">Location</label>
+  <input list="location-options" id="location" class="form-control" required>
+  <datalist id="location-options">
+    <!-- Grade 1 to 8: A–Z -->
+    <option value="1A"><option value="1B"><option value="1C"><option value="1D"><option value="1E"><option value="1F"><option value="1G"><option value="1H"><option value="1I"><option value="1J"><option value="1K"><option value="1L"><option value="1M"><option value="1N"><option value="1O"><option value="1P"><option value="1Q"><option value="1R"><option value="1S"><option value="1T"><option value="1U"><option value="1V"><option value="1W"><option value="1X"><option value="1Y"><option value="1Z">
+    <option value="2A"><option value="2B"><option value="2C"><option value="2D"><option value="2E"><option value="2F"><option value="2G"><option value="2H"><option value="2I"><option value="2J"><option value="2K"><option value="2L"><option value="2M"><option value="2N"><option value="2O"><option value="2P"><option value="2Q"><option value="2R"><option value="2S"><option value="2T"><option value="2U"><option value="2V"><option value="2W"><option value="2X"><option value="2Y"><option value="2Z">
+    <option value="3A"><option value="3B"><option value="3C"><option value="3D"><option value="3E"><option value="3F"><option value="3G"><option value="3H"><option value="3I"><option value="3J"><option value="3K"><option value="3L"><option value="3M"><option value="3N"><option value="3O"><option value="3P"><option value="3Q"><option value="3R"><option value="3S"><option value="3T"><option value="3U"><option value="3V"><option value="3W"><option value="3X"><option value="3Y"><option value="3Z">
+    <option value="4A"><option value="4B"><option value="4C"><option value="4D"><option value="4E"><option value="4F"><option value="4G"><option value="4H"><option value="4I"><option value="4J"><option value="4K"><option value="4L"><option value="4M"><option value="4N"><option value="4O"><option value="4P"><option value="4Q"><option value="4R"><option value="4S"><option value="4T"><option value="4U"><option value="4V"><option value="4W"><option value="4X"><option value="4Y"><option value="4Z">
+    <option value="5A"><option value="5B"><option value="5C"><option value="5D"><option value="5E"><option value="5F"><option value="5G"><option value="5H"><option value="5I"><option value="5J"><option value="5K"><option value="5L"><option value="5M"><option value="5N"><option value="5O"><option value="5P"><option value="5Q"><option value="5R"><option value="5S"><option value="5T"><option value="5U"><option value="5V"><option value="5W"><option value="5X"><option value="5Y"><option value="5Z">
+    <option value="6A"><option value="6B"><option value="6C"><option value="6D"><option value="6E"><option value="6F"><option value="6G"><option value="6H"><option value="6I"><option value="6J"><option value="6K"><option value="6L"><option value="6M"><option value="6N"><option value="6O"><option value="6P"><option value="6Q"><option value="6R"><option value="6S"><option value="6T"><option value="6U"><option value="6V"><option value="6W"><option value="6X"><option value="6Y"><option value="6Z">
+    <option value="7A"><option value="7B"><option value="7C"><option value="7D"><option value="7E"><option value="7F"><option value="7G"><option value="7H"><option value="7I"><option value="7J"><option value="7K"><option value="7L"><option value="7M"><option value="7N"><option value="7O"><option value="7P"><option value="7Q"><option value="7R"><option value="7S"><option value="7T"><option value="7U"><option value="7V"><option value="7W"><option value="7X"><option value="7Y"><option value="7Z">
+    <option value="8A"><option value="8B"><option value="8C"><option value="8D"><option value="8E"><option value="8F"><option value="8G"><option value="8H"><option value="8I"><option value="8J"><option value="8K"><option value="8L"><option value="8M"><option value="8N"><option value="8O"><option value="8P"><option value="8Q"><option value="8R"><option value="8S"><option value="8T"><option value="8U"><option value="8V"><option value="8W"><option value="8X"><option value="8Y"><option value="8Z">
+
+    <!-- Grade 9 -->
+    <option value="9S1"><option value="9S2"><option value="9S3"><option value="9S4"><option value="9S5"><option value="9S6"><option value="9S7">
+    <option value="9B1"><option value="9B2"><option value="9B3"><option value="9B4"><option value="9B5"><option value="9B6"><option value="9B7">
+
+    <!-- Grade 10 -->
+    <option value="10S1"><option value="10S2"><option value="10S3"><option value="10S4"><option value="10S5"><option value="10S6"><option value="10S7">
+    <option value="10B1"><option value="10B2"><option value="10B3"><option value="10B4"><option value="10B5"><option value="10B6"><option value="10B7">
+
+    <!-- Extra Rooms -->
+    <option value="AV Room">
+    <option value="Conference Room">
+    <option value="Meeting Room 2">
+    <option value="Hall">
+    <option value="Staff Room (Secondary)">
+    <option value="Staff Room (Primary)">
+    <option value="LT Room">
+  </datalist>
+</div>
+    <div class="form-group mb-3">
+      <label for="type">Report Type</label>
+      <select id="type" class="form-select" required>
+        <option value="">Select</option>
+        <option value="Property Damage">Property Damage</option>
+        <option value="Graffiti">Graffiti</option>
+        <option value="Littering">Littering</option>
+        <option value="Tampering">Tampering</option>
+      </select>
+    </div>
+    <div class="form-group mb-3">
+      <label for="suspect">Suspect (if any)</label>
+      <input type="text" id="suspect" class="form-control">
+    </div>
+<div class="form-group mb-3">
+  <label for="images">Upload Images (1-5 per submission)</label>
+  <input type="file" id="images" name="images" class="form-control" multiple accept="image/*" capture="environment">
+  <div id="preview" class="mt-2 d-flex flex-wrap gap-2"></div>
+</div>
+
+    <div class="mt-4">
+	<center>
+      <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+      <button type="button" class="btn btn-danger" onclick="clearForm()">Clear</button>
+      <button type="button" class="btn btn-danger" onclick="navigateToLandingPage()">Back</button>
+	 
+	 <!-- Progress Container -->
+<div id="submitProgress" class="mt-4 text-center" style="display:none;">
+  <div class="progress" style="height: 25px;">
+    <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+         role="progressbar" style="width: 0%;" id="progressBar">Submitting...</div>
+  </div>
+  <div id="submitStatus" class="mt-2 fw-bold text-success" style="display:none;">Report submitted successfully!</div>
+</div>
+	 
+	 
+	  
+	  	</center>
+    </div>
+  </form>
+
+<div class="mt-5">
+  <h5>My Reports Log</h5>
+  <div style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd;">
+    <table id="reportGrid" class="table table-bordered mb-0">
+      <thead class="table-light">
+        <tr>
+          <th><center>FileID</center></th>
+          <th><center>Date</center></th>
+          <th><center>Location</center></th>
+          <th><center>Action</center></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+
+<!-- Filter & View Panel -->
+<div id="viewPanel" style="display: none;" class="border p-3 rounded bg-light">
+  <h5 class="mb-3">View Submitted Reports</h5>
+  
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <label for="filterDate" class="form-label">Date</label>
+      <input type="date" id="filterDate" class="form-control">
+    </div>
+    <div class="col-md-4">
+      <label for="filterType" class="form-label">Report Type</label>
+      <select id="filterType" class="form-select">
+        <option value="">All</option>
+        <option value="Property Damage">Property Damage</option>
+        <option value="Graffiti">Graffiti</option>
+        <option value="Littering">Littering</option>
+        <option value="Tampering">Tampering</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="filterStaff" class="form-label">Reported Staff NID</label>
+      <input type="text" id="filterStaff" class="form-control">
+    </div>
+<div class="col-md-4">
+  <label>Location</label>
+  <input list="location-options" id="location" class="form-control" required>
+  <datalist id="location-options">
+    <!-- Grade 1 to 8: A–Z -->
+    <option value="1A"><option value="1B"><option value="1C"><option value="1D"><option value="1E"><option value="1F"><option value="1G"><option value="1H"><option value="1I"><option value="1J"><option value="1K"><option value="1L"><option value="1M"><option value="1N"><option value="1O"><option value="1P"><option value="1Q"><option value="1R"><option value="1S"><option value="1T"><option value="1U"><option value="1V"><option value="1W"><option value="1X"><option value="1Y"><option value="1Z">
+    <option value="2A"><option value="2B"><option value="2C"><option value="2D"><option value="2E"><option value="2F"><option value="2G"><option value="2H"><option value="2I"><option value="2J"><option value="2K"><option value="2L"><option value="2M"><option value="2N"><option value="2O"><option value="2P"><option value="2Q"><option value="2R"><option value="2S"><option value="2T"><option value="2U"><option value="2V"><option value="2W"><option value="2X"><option value="2Y"><option value="2Z">
+    <option value="3A"><option value="3B"><option value="3C"><option value="3D"><option value="3E"><option value="3F"><option value="3G"><option value="3H"><option value="3I"><option value="3J"><option value="3K"><option value="3L"><option value="3M"><option value="3N"><option value="3O"><option value="3P"><option value="3Q"><option value="3R"><option value="3S"><option value="3T"><option value="3U"><option value="3V"><option value="3W"><option value="3X"><option value="3Y"><option value="3Z">
+    <option value="4A"><option value="4B"><option value="4C"><option value="4D"><option value="4E"><option value="4F"><option value="4G"><option value="4H"><option value="4I"><option value="4J"><option value="4K"><option value="4L"><option value="4M"><option value="4N"><option value="4O"><option value="4P"><option value="4Q"><option value="4R"><option value="4S"><option value="4T"><option value="4U"><option value="4V"><option value="4W"><option value="4X"><option value="4Y"><option value="4Z">
+    <option value="5A"><option value="5B"><option value="5C"><option value="5D"><option value="5E"><option value="5F"><option value="5G"><option value="5H"><option value="5I"><option value="5J"><option value="5K"><option value="5L"><option value="5M"><option value="5N"><option value="5O"><option value="5P"><option value="5Q"><option value="5R"><option value="5S"><option value="5T"><option value="5U"><option value="5V"><option value="5W"><option value="5X"><option value="5Y"><option value="5Z">
+    <option value="6A"><option value="6B"><option value="6C"><option value="6D"><option value="6E"><option value="6F"><option value="6G"><option value="6H"><option value="6I"><option value="6J"><option value="6K"><option value="6L"><option value="6M"><option value="6N"><option value="6O"><option value="6P"><option value="6Q"><option value="6R"><option value="6S"><option value="6T"><option value="6U"><option value="6V"><option value="6W"><option value="6X"><option value="6Y"><option value="6Z">
+    <option value="7A"><option value="7B"><option value="7C"><option value="7D"><option value="7E"><option value="7F"><option value="7G"><option value="7H"><option value="7I"><option value="7J"><option value="7K"><option value="7L"><option value="7M"><option value="7N"><option value="7O"><option value="7P"><option value="7Q"><option value="7R"><option value="7S"><option value="7T"><option value="7U"><option value="7V"><option value="7W"><option value="7X"><option value="7Y"><option value="7Z">
+    <option value="8A"><option value="8B"><option value="8C"><option value="8D"><option value="8E"><option value="8F"><option value="8G"><option value="8H"><option value="8I"><option value="8J"><option value="8K"><option value="8L"><option value="8M"><option value="8N"><option value="8O"><option value="8P"><option value="8Q"><option value="8R"><option value="8S"><option value="8T"><option value="8U"><option value="8V"><option value="8W"><option value="8X"><option value="8Y"><option value="8Z">
+
+    <!-- Grade 9 -->
+    <option value="9S1"><option value="9S2"><option value="9S3"><option value="9S4"><option value="9S5"><option value="9S6"><option value="9S7">
+    <option value="9B1"><option value="9B2"><option value="9B3"><option value="9B4"><option value="9B5"><option value="9B6"><option value="9B7">
+
+    <!-- Grade 10 -->
+    <option value="10S1"><option value="10S2"><option value="10S3"><option value="10S4"><option value="10S5"><option value="10S6"><option value="10S7">
+    <option value="10B1"><option value="10B2"><option value="10B3"><option value="10B4"><option value="10B5"><option value="10B6"><option value="10B7">
+
+    <!-- Extra Rooms -->
+    <option value="AV Room">
+    <option value="Conference Room">
+    <option value="Meeting Room 2">
+    <option value="Hall">
+    <option value="Staff Room (Secondary)">
+    <option value="Staff Room (Primary)">
+    <option value="LT Room">
+  </datalist>
+</div>
+    <div class="col-md-6">
+      <label for="filterSuspect" class="form-label">Suspect</label>
+      <input type="text" id="filterSuspect" class="form-control">
+    </div>
+  </div>
+
+  <div class="text-center">
+    <button class="btn btn-primary" onclick="searchFilteredReports()">Search</button>
+  </div>
+
+  <div class="mt-4" id="filterResults">
+    <!-- Filtered images or reports will be displayed here -->
+  </div>
+  
+
+ <!-- Bootstrap Modal for full-screen image preview -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen"> <!-- Fullscreen modal -->
+    <div class="modal-content bg-dark text-white border-0">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex justify-content-center align-items-center p-0">
+        <img id="modalImage" src="" alt="Preview" class="img-fluid w-100 h-auto" style="object-fit: contain; max-height: 100vh;">
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+
+
+    <div class="developer-credit text-center my-4">Developed by: Mifthah Ahmed</div>
+
+
+<script>
+function navigateToLandingPage() {
+  const rank = localStorage.getItem("userRank");
+
+  if (rank === "TEACHER") {
+    navigateWithFade('teachers_landing_page.html');
+  } else if (rank === "SMT") {
+    navigateWithFade('smt_landing_page.html');
+  } else {
+    alert("Access denied. Invalid rank.");
+    navigateWithFade('index.html'); // Optional: redirect to login
+  }
+}
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const phoneNumber = localStorage.getItem('phoneNumber');
+
+  // Set current date
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('date').value = today;
+
+  if (phoneNumber) {
+    document.getElementById('nid').value = phoneNumber;
+    recallUserName();
+  }
+});
+
+function loadSubmittedReports() {
+  const nid = localStorage.getItem('phoneNumber');
+  if (!nid) return;
+
+  fetch(`https://script.google.com/macros/s/AKfycbz2JG_zy4z07b1Y-QmnrbFmOkjpmiAXSZMGvpHTkNDGrHVBf1NU7h2zzF_SJq6wL3RrMA/exec?action=getReports&nid=${nid}`)
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.querySelector("#reportGrid tbody");
+      tbody.innerHTML = "";
+
+      if (data.status !== "success" || !data.reports.length) {
+        tbody.innerHTML = "<tr><td colspan='4'><center>No reports found.</center></td></tr>";
+        return;
+      }
+
+      // Format the date to YYYY-MM-DD
+      const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString; // fallback if invalid
+        return date.toISOString().split("T")[0];
+      };
+
+      data.reports.forEach(record => {
+        const fileID = record['Custom ID'] || record['customId'] || record['ID'] || record['id'] || record[Object.keys(record)[0]];
+        const formattedDate = formatDate(record['Date'] || '');
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td style='padding:10px; border: 1px solid #ccc;'><center>${fileID}</center></td>
+          <td style='padding:10px; border: 1px solid #ccc;'><center>${formattedDate}</center></td>
+          <td style='padding:10px; border: 1px solid #ccc;'><center>${record['Location'] || ''}</center></td>
+          <td style='padding:10px; border: 1px solid #ccc;'>
+            <center><button class="btn btn-danger" style="font-size: 12px; padding: 2px 8px;" onclick="deleteReport('${fileID}')">Delete</button></center>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      console.error("Error loading reports:", err);
+    });
+}
+
+
+function deleteReport(id) {
+  if (!id) {
+    alert("Invalid report ID.");
+    return;
+  }
+  if (!confirm("Are you sure you want to delete this report?")) {
+    return;
+  }
+
+  fetch(`https://script.google.com/macros/s/AKfycbz2JG_zy4z07b1Y-QmnrbFmOkjpmiAXSZMGvpHTkNDGrHVBf1NU7h2zzF_SJq6wL3RrMA/exec?action=deleteReport&id=${encodeURIComponent(id)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'success') {
+        alert(data.message);
+        loadSubmittedReports();  // Refresh list
+      } else {
+        alert("Delete failed: " + data.message);
+      }
+    })
+    .catch(err => alert("Error deleting report: " + err));
+}
+
+// Call on page load
+window.addEventListener("DOMContentLoaded", loadSubmittedReports);
+
+
+function recallUserName() {
+  const nid = document.getElementById('nid').value;
+
+  fetch(`https://script.google.com/macros/s/AKfycbxcif2M0iA6aZS3MB-XUNRg6ifXKFFCNhwly3llzuI-005QEv0BN3mfibBK4uTDvOu8/exec?action=getUserDetails&nid=${nid}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('name').value = data.name;
+      } else {
+        console.warn('User not found');
+        document.getElementById('name').value = '';
+      }
+    })
+    .catch(error => console.error('Error recalling user name:', error));
+}
+
+const imagesInput = document.getElementById("images");
+const submitButton = document.querySelector("#reportForm button[type=submit]");
+
+const progressContainer = document.getElementById("submitProgress");
+const progressBar = document.getElementById("progressBar");
+const submitStatus = document.getElementById("submitStatus");
+
+document.getElementById("reportForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  submitButton.disabled = true;
+
+  const requiredFields = ["date", "nid", "name", "location", "type"];
+  let valid = true;
+
+  requiredFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) {
+      valid = false;
+      el.classList.add("is-invalid");
+    } else {
+      el.classList.remove("is-invalid");
+    }
+  });
+
+  const files = imagesInput.files;
+  if (files.length === 0 || files.length > 5) {
+    alert("Please upload between 1 and 5 images.");
+    submitButton.disabled = false;
+    return;
+  }
+
+  if (!valid) {
+    alert("Please fill in all required fields.");
+    submitButton.disabled = false;
+    return;
+  }
+
+  const formData = {
+    date: document.getElementById("date").value,
+    nid: document.getElementById("nid").value,
+    name: document.getElementById("name").value,
+    location: document.getElementById("location").value,
+    type: document.getElementById("type").value,
+    suspect: document.getElementById("suspect").value
+  };
+
+  const payload = new URLSearchParams();
+  payload.append("formData", JSON.stringify(formData));
+  payload.append("imageCount", files.length);
+
+  progressContainer.style.display = "block";
+  submitStatus.style.display = "none";
+  progressBar.classList.remove("bg-success", "bg-danger");
+  progressBar.classList.add("bg-info");
+  progressBar.style.width = "0%";
+  progressBar.textContent = "Uploading 0%";
+
+  // Step 1: Read all images, append to payload
+  const readers = [];
+  [...files].forEach((file, index) => {
+    const reader = new FileReader();
+    readers.push(new Promise((resolve) => {
+      reader.onload = function (e) {
+        const base64 = e.target.result.split(',')[1];
+        payload.append(`image${index}`, base64);
+        payload.append(`mimetype${index}`, file.type);
+        payload.append(`filename${index}`, file.name);
+        resolve();
+      };
+      reader.readAsDataURL(file);
+    }));
+  });
+
+  Promise.all(readers).then(() => {
+    // Step 2: Animate progress from 0 to 90% gradually (simulate upload progress)
+    let progress = 0;
+    progressBar.style.width = "0%";
+    progressBar.textContent = "Uploading 0%";
+
+    function animateUpload() {
+      if (progress < 90) {
+        progress++;
+        progressBar.style.width = progress + "%";
+        progressBar.textContent = `Uploading ${progress}%`;
+        setTimeout(animateUpload, 50); // ~4.5 seconds to reach 90%
+      }
+    }
+    animateUpload();
+
+    // Step 3: Send data to server
+    fetch("https://script.google.com/macros/s/AKfycbz2JG_zy4z07b1Y-QmnrbFmOkjpmiAXSZMGvpHTkNDGrHVBf1NU7h2zzF_SJq6wL3RrMA/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString(),
+    })
+      .then(res => res.json())
+.then(result => {
+  // Step 4: Animate from current progress to 100%
+  let finalProgress = parseInt(progressBar.style.width) || 0;
+
+  function finishProgress() {
+    if (finalProgress < 100) {
+      finalProgress++;
+      progressBar.style.width = finalProgress + "%";
+      progressBar.textContent = `Uploading ${finalProgress}%`;
+      setTimeout(finishProgress, 20); // faster finish
+    } else {
+      progressBar.textContent = "Completed";
+      submitStatus.style.display = "block";
+
+      if (result.status === "success") {
+        submitStatus.textContent = "Submitted successfully! " + result.message;
+        submitStatus.classList.remove("text-danger");
+        submitStatus.classList.add("text-success");
+
+        // Clear form and preview
+        clearForm(true);
+
+        // After short delay, reset progress bar and hide it
+        setTimeout(() => {
+          progressBar.style.width = "0%";
+          progressBar.textContent = "";
+          progressContainer.style.display = "none";
+          submitStatus.style.display = "none";
+          submitButton.disabled = false;
+        }, 2500); // 2.5 seconds to let user see success message
+
+      } else {
+        progressBar.classList.remove("bg-info");
+        progressBar.classList.add("bg-danger");
+        progressBar.textContent = "Failed";
+        submitStatus.textContent = result.message;
+        submitStatus.classList.remove("text-success");
+        submitStatus.classList.add("text-danger");
+        submitButton.disabled = false;
+      }
+    }
+  }
+
+  finishProgress();
+})
+      .catch(error => {
+        progressBar.classList.remove("bg-info");
+        progressBar.classList.add("bg-danger");
+        progressBar.textContent = "Error";
+        submitStatus.textContent = "Error submitting: " + error.message;
+        submitStatus.classList.remove("text-success");
+        submitStatus.classList.add("text-danger");
+        submitStatus.style.display = "block";
+        submitButton.disabled = false;
+      });
+  });
+});
+
+
+
+function clearForm(afterSubmit = false) {
+  const keepIds = ["date", "nid", "name"];
+  const form = document.getElementById("reportForm");
+
+  [...form.elements].forEach(el => {
+    if (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.tagName === "SELECT") {
+      if (!keepIds.includes(el.id)) {
+        if (el.type === "file") {
+          el.value = "";
+        } else {
+          el.value = "";
+        }
+      }
+    }
+  });
+
+  document.getElementById("preview").innerHTML = "";
+
+  if (afterSubmit) {
+    recallUserName();
+	loadSubmittedReports();
+  }
+}
+
+
+
+
+// Show image previews
+imagesInput.addEventListener("change", function () {
+  const preview = document.getElementById("preview");
+  preview.innerHTML = "";
+  [...this.files].forEach(file => {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    img.style.width = "100px";
+    img.style.margin = "5px";
+    preview.appendChild(img);
+  });
+});
+
+
+
+
+
+
+  const input = document.getElementById('images');
+  const preview = document.getElementById('preview');
+  let filesArray = [];
+
+  function updatePreview() {
+    preview.innerHTML = '';
+    filesArray.forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'inline-block';
+
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '5px';
+        img.style.border = '1px solid #ccc';
+
+        const removeBtn = document.createElement('button');
+removeBtn.classList.add('remove-btn');
+removeBtn.title = 'Remove image';
+removeBtn.addEventListener('click', () => {
+  filesArray.splice(index, 1);
+  updatePreview();
+  updateInputFiles();
+});
+
+        wrapper.appendChild(img);
+        wrapper.appendChild(removeBtn);
+        preview.appendChild(wrapper);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function updateInputFiles() {
+    const dataTransfer = new DataTransfer();
+    filesArray.forEach(file => dataTransfer.items.add(file));
+    input.files = dataTransfer.files;
+  }
+
+  input.addEventListener('change', () => {
+    // Add new files but limit total to 5
+    const newFiles = Array.from(input.files);
+    filesArray = filesArray.concat(newFiles).slice(0, 5);
+    updatePreview();
+    updateInputFiles();
+  });
+
+
+</script>
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+
+<script>
+document.getElementById('toggleViewPanel').addEventListener('click', function () {
+  const isPanelVisible = document.getElementById('viewPanel').style.display === 'block';
+
+  // Toggle visibility of form and log
+  document.getElementById('reportForm').style.display = isPanelVisible ? 'block' : 'none';
+  document.getElementById('submitBtn').style.display = isPanelVisible ? 'inline-block' : 'none';
+  document.querySelector('[onclick="clearForm()"]').style.display = isPanelVisible ? 'inline-block' : 'none';
+  document.querySelector('[onclick^="navigateToLandingPage"]').style.display = isPanelVisible ? 'inline-block' : 'none';
+  document.querySelector('h5').style.display = isPanelVisible ? 'block' : 'none';
+  document.getElementById('reportGrid').parentElement.parentElement.style.display = isPanelVisible ? 'block' : 'none';
+
+  // Toggle view panel
+  document.getElementById('viewPanel').style.display = isPanelVisible ? 'none' : 'block';
+
+  // Change button text
+  this.textContent = isPanelVisible ? 'View panel' : 'Close view panel';
+});
+
+// Placeholder for filter search
+function searchFilteredReports() {
+  const date = document.getElementById('filterDate').value;
+  const type = document.getElementById('filterType').value;
+  const staff = document.getElementById('filterStaff').value.trim();
+  const location = document.getElementById('filterLocation').value.trim();
+  const suspect = document.getElementById('filterSuspect').value.trim();
+
+  // Placeholder HTML
+  const resultsDiv = document.getElementById('filterResults');
+  resultsDiv.innerHTML = `<p class="text-muted">Filtering reports by:</p>
+    <ul>
+      ${date ? `<li><strong>Date:</strong> ${date}</li>` : ''}
+      ${type ? `<li><strong>Type:</strong> ${type}</li>` : ''}
+      ${staff ? `<li><strong>Staff NID:</strong> ${staff}</li>` : ''}
+      ${location ? `<li><strong>Location:</strong> ${location}</li>` : ''}
+      ${suspect ? `<li><strong>Suspect:</strong> ${suspect}</li>` : ''}
+    </ul>
+    <p><em>Implement your filtering logic here to load and display matching report images.</em></p>`;
+}
+</script>
+
+
+
+<script>
+function searchFilteredReports() {
+  const date = document.getElementById('filterDate').value;
+  const type = document.getElementById('filterType').value;
+  const nid = document.getElementById('filterStaff').value.trim();
+  const location = document.getElementById('filterLocation').value.trim();
+  const suspect = document.getElementById('filterSuspect').value.trim();
+
+  const params = new URLSearchParams({
+    action: 'getReports',
+    date,
+    type,
+    nid,
+    location,
+    suspect
+  });
+
+  fetch('https://script.google.com/macros/s/AKfycbyWkSGYq-kmY6LBStaFiAOAQ95r5HKwEskdDle6CN2IFNk-hJsL1cOIKOK-lklFks7Z/exec?' + params)
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('filterResults');
+      container.innerHTML = '';
+
+      if (data.status === 'success' && data.reports.length > 0) {
+        data.reports.forEach(report => {
+          const div = document.createElement('div');
+          div.className = 'card mb-3 shadow-sm';
+
+          let imagesHTML = '';
+          for (let i = 1; i <= 5; i++) {
+            let url = report[`Image ${i}`];
+            if (url && url.startsWith('http')) {
+              imagesHTML += `
+                <img src="${url.trim()}" 
+                     class="img-thumbnail me-2 mb-2" 
+                     style="height: 100px; cursor: pointer;" 
+                     onclick="openImageModal('${url.trim().replace(/'/g, "\\'")}')">`;
+            }
+          }
+
+          div.innerHTML = `
+            <div class="card-body">
+              <h5 class="card-title">${report['Report type']} - ${report['Location']}</h5>
+              <p class="card-text"><strong>Date:</strong> ${report['Date']}</p>
+              <p class="card-text"><strong>Reported By:</strong> ${report['Reported staff name']}</p>
+              <p class="card-text"><strong>Suspect:</strong> ${report['suspect']}</p>
+              <div class="d-flex flex-wrap">${imagesHTML || '<p class="text-muted">No images attached.</p>'}</div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } else {
+        container.innerHTML = '<p class="text-danger">No matching records found.</p>';
+      }
+    })
+    .catch(err => {
+      console.error('Fetch error:', err);
+      document.getElementById('filterResults').innerHTML = '<p class="text-danger">An error occurred while loading reports.</p>';
+    });
+}
+
+function openImageModal(url) {
+  const modalImage = document.getElementById('modalImage');
+  modalImage.onerror = () => {
+    window.open(url, '_blank');
+  };
+  modalImage.src = url;
+  const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+  modal.show();
+}
+</script>
+
+
+
+
+
+
+</body>
+</html>

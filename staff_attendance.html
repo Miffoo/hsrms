@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Huravee School Staff Attendance</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  
+  <script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+  
+  
+  <style>
+    body {
+      background-color: #f3f7f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .app-title {
+      background-color: #2e7d32;
+      color: white;
+      padding: 1.2rem;
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 600;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .container {
+      background-color: white;
+      padding: 2rem;
+      margin-top: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2, h4 {
+      color: #2e7d32;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .form-control, .btn, select {
+      border-radius: 12px !important;
+    }
+
+    .btn-success {
+      background-color: #388e3c;
+      border: none;
+    }
+
+    .btn-success:hover {
+      background-color: #2e7d32;
+    }
+
+    .btn-danger {
+      background-color: #c62828;
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background-color: #b71c1c;
+    }
+
+    .btn-secondary {
+      background-color: #78909c;
+      border: none;
+    }
+
+    .btn-secondary:hover {
+      background-color: #607d8b;
+    }
+
+    .form-group.col {
+      min-width: 140px;
+    }
+
+    .table-responsive {
+      margin-top: 2rem;
+    }
+
+    .attendance-table, .table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .attendance-table th, .attendance-table td,
+    .table th, .table td {
+      text-align: center;
+      vertical-align: middle !important;
+      border: 1px solid #e0e0e0;
+    }
+
+    .table-success {
+      background-color: #a5d6a7 !important;
+      color: #1b5e20;
+    }
+
+    .table-info {
+      background-color: #c8e6c9 !important;
+    }
+
+    .thead-dark th {
+      background-color: #388e3c !important;
+      color: white;
+    }
+
+    .tick {
+      color: green;
+      font-weight: bold;
+    }
+
+    .leave {
+      color: red;
+      font-weight: bold;
+    }
+
+    .developer-credit {
+      margin-top: 3rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: gray;
+    }
+
+    #supervisorName {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+	
+	        .developer-credit {
+            text-align: center;
+            font-size: 18px;
+            color: #3c763d;
+            margin-top: 20px;
+            font-style: italic;
+            font-family: "Georgia", serif;
+        }
+  </style>
+  
+  
+  
+  	<style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+  
+
+  
+</head>
+<body>
+
+  <div class="container">
+    <h2> <center> Select Assgined Staffs </center> </h2>
+    
+    <div class="form-row">
+
+	
+	        <div class="form-group col-md-2">
+            <label>NID:</label>
+            <label id="supervisorNID" class="form-control" readonly></label>
+        </div>
+	
+	
+
+
+        <div class="form-group col-md-6">
+            <label>Supervisor Name:</label>
+			<input type="text" id="supervisor" name="supervisor" class="form-control" readonly />
+        </div>
+
+
+
+      <div class="form-group col-md-2">
+        <label for="term">Term</label>
+        <select class="form-control" id="term" onchange="updateTableHeader()">
+          <option value="Term 1">Term 1</option>
+          <option value="Term 2">Term 2</option>
+        </select>
+      </div>
+      <div class="form-group col-md-2">
+        <label for="currentYear">Year</label>
+        <input type="text" class="form-control" id="currentYear" readonly>
+      </div>
+    </div>
+	
+	<div class="form-row">
+
+	 
+
+
+  <div class="form-group col-md-4">
+    <label for="nid">Staff NID:</label>
+    <input type="text" id="nid" name="nid" class="form-control" readonly />
+  </div>
+
+
+
+
+
+
+	 
+	          <div class="form-group col-md-4">
+            <label for="staffDropdown">Select Staff:</label>
+            <select id="staffDropdown" class="form-control" onchange="updateStaffDetails()">
+                <option value="">-- Select Staff --</option>
+                <!-- Dynamically populated -->
+            </select>
+        </div>
+	  
+	          <div class="form-group">
+
+          
+			<input type="text" id="staffName" name="staffName" class="form-control" readonly hidden />
+        </div>
+	  
+    
+      <div class="form-group col-md-4">
+        <label for="department">Department</label>
+        <input type="text" class="form-control" id="department" readonly>
+      </div>
+    </div>
+
+
+    <h4> <center> Mark Attendance </center> </h4>
+
+<div class="form-row mb-3">
+  <div class="form-group col-md-6">
+    <label for="monthSelect">Select Month</label>
+    <select class="form-control" id="monthSelect" onchange="updateHeader(); loadAttendance();">
+      <option value="January">January</option>
+	  <option value="February">February</option>
+      <option value="March">March</option>
+	  <option value="April">April</option>
+      <option value="May">May</option>
+	  <option value="June">June</option>
+      <option value="July">July</option>
+	  <option value="August">August</option>
+      <option value="September">September</option>
+	  <option value="October">October</option>
+      <option value="November">November</option>
+	  <option value="December">December</option>
+    </select>
+  </div>
+  <div class="form-group col-md-6">
+    <label for="weekSelect">Select Week</label>
+    <select class="form-control" id="weekSelect" onchange="updateHeader(); loadAttendance();">
+      <option value="1">Week 1</option>
+      <option value="2">Week 2</option>
+      <option value="3">Week 3</option>
+      <option value="4">Week 4</option>
+      <option value="5">Week 5</option>
+    </select>
+  </div>
+</div>
+
+
+
+<form id="attendanceForm">
+
+   <div class="form-row form-section" style="overflow-x: auto; white-space: nowrap;">
+      <div class="form-group col">
+        <label for="sat">Saturday</label>
+        <select class="form-control" id="sat">
+          <option>✔️</option><option>UL</option><option>ML</option><option>MTL</option>
+          <option>NPL</option><option>FRL</option><option>SL</option><option>PL</option>
+        </select>
+      </div>
+      <div class="form-group col">
+        <label for="sun">Sunday</label>
+        <select class="form-control" id="sun">
+          <option>✔️</option><option>UL</option><option>ML</option><option>MTL</option>
+          <option>NPL</option><option>FRL</option><option>SL</option><option>PL</option>
+        </select>
+      </div>
+      <div class="form-group col">
+        <label for="mon">Monday</label>
+        <select class="form-control" id="mon">
+          <option>✔️</option><option>UL</option><option>ML</option><option>MTL</option>
+          <option>NPL</option><option>FRL</option><option>SL</option><option>PL</option>
+        </select>
+      </div>
+      <div class="form-group col">
+        <label for="tue">Tuesday</label>
+        <select class="form-control" id="tue">
+          <option>✔️</option><option>UL</option><option>ML</option><option>MTL</option>
+          <option>NPL</option><option>FRL</option><option>SL</option><option>PL</option>
+        </select>
+      </div>
+      <div class="form-group col">
+        <label for="wed">Wednesday</label>
+        <select class="form-control" id="wed">
+          <option>✔️</option><option>UL</option><option>ML</option><option>MTL</option>
+          <option>NPL</option><option>FRL</option><option>SL</option><option>PL</option>
+        </select>
+      </div>
+      <div class="form-group col">
+        <label for="thu">Thursday</label>
+        <select class="form-control" id="thu">
+          <option>✔️</option><option>UL</option><option>ML</option><option>MTL</option>
+          <option>NPL</option><option>FRL</option><option>SL</option><option>PL</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row form-section">
+      <div class="form-group col-md-6">
+        <label for="missedPeriods">Missed Periods</label>
+        <input type="number" class="form-control" id="missedPeriods">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="periodsTaken">Periods Taken</label>
+        <input type="number" class="form-control" id="periodsTaken">
+      </div>
+    </div>
+<center>
+    <button type="button" id="submitBtn" class="btn btn-success" onclick="submitAttendance()">Submit Attendance</button>
+    <button type="button" class="btn btn-secondary ml-2" onclick="clearForm()">Clear</button>
+
+			<button class="btn btn-danger" type="button" onclick="navigateWithFade('smt_landing_page.html')">Go Back</button>
+	
+	</center>
+  </form>
+
+  <hr>
+
+  <h4> <center> Attendance Records </center></h4>
+  <div class="table-responsive">
+<table class="table table-bordered table-striped" id="attendanceTable">
+  <thead>
+    <!-- Row 1: Term and Year -->
+    <tr class="table-success text-center">
+      <th colspan="14" id="termHeader">Term 1 / 2025</th>
+    </tr>
+    <!-- Row 2: Week info -->
+    <tr class="table-info text-center">
+      <th colspan="14" id="weekRange">Week 1 (Apr 12 - Apr 17)</th>
+      
+    </tr>
+    <!-- Actual column headers -->
+    <tr class="thead-dark">
+      <th>NID</th><th>Name</th><th>Department</th><th>Supervisor</th>
+      <th>Sat</th><th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th>
+      <th>Leaves</th><th>Classes Missed</th><th>Classes Taken</th><th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+</div>
+</div>
+
+ <!-- Developer Credit Section (outside the form) -->
+  <div class="developer-credit" style="text-align: center; margin-top: 20px;">
+    Developed by: Mifthah Ahmed
+  </div>
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+
+<script>
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const supervisorNID = localStorage.getItem("phoneNumber");
+    if (!supervisorNID) {
+        alert("Supervisor NID not found in local storage. Please log in again.");
+        return;
+    }
+
+    document.getElementById("supervisorNID").innerText = supervisorNID;
+
+    // Fetch supervisor name
+    fetch(`https://script.google.com/macros/s/AKfycbw78w4MMEg-o-BFV3Dt4NceyMqWgPSU2qDtZ2SfSmirt7k6PfhMc-WTEAsHDMqSqev8/exec?action=getSupervisorDetails&supervisorNID=${supervisorNID}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+			
+                document.getElementById("supervisor").value = data.supervisorName;
+            } else {
+                document.getElementById("supervisor").value = "Not Found";
+            }
+        });
+
+    // Fetch assigned staffs
+    fetch(`https://script.google.com/macros/s/AKfycbw78w4MMEg-o-BFV3Dt4NceyMqWgPSU2qDtZ2SfSmirt7k6PfhMc-WTEAsHDMqSqev8/exec?action=getStaffsBySupervisor&supervisorNID=${supervisorNID}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                const dropdown = document.getElementById("staffDropdown");
+                data.staffs.forEach(staff => {
+                    const option = document.createElement("option");
+                    option.value = staff.nid;
+                    option.text = staff.name;
+                    option.setAttribute("data-nid", staff.nid);
+					option.setAttribute("data-department", staff.department); // add department
+                    dropdown.appendChild(option);
+                });
+            }
+        });
+});
+
+
+
+function updateStaffDetails() {
+    const staffDropdown = document.getElementById("staffDropdown");
+    const selectedOption = staffDropdown.options[staffDropdown.selectedIndex];
+    document.getElementById("nid").value = selectedOption.getAttribute("data-nid") || "";
+    document.getElementById("staffName").value = selectedOption.text || "";
+	document.getElementById("department").value = selectedOption.getAttribute("data-department") || "";
+}
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    const endpoint = 'https://script.google.com/macros/s/AKfycbw9hP6FXosy1RfP9IptHx5Cums1ddVaeBOKfQvPMH4B1GLPP6s85KK4Qd_4RmmlUAJh/exec';
+	
+    let editingNID = null;
+
+function submitAttendance() {
+  const weekDays = ['sat', 'sun', 'mon', 'tue', 'wed', 'thu'];
+  let leaveCount = 0;
+
+  const data = {
+    action: editingNID ? 'updateAttendance' : 'submitAttendance',
+    nid: document.getElementById('nid').value,
+    name: document.getElementById('staffName').value,
+    department: document.getElementById('department').value,
+    supervisor: document.getElementById('supervisor').value,
+    missed: document.getElementById('missedPeriods').value,
+    taken: document.getElementById('periodsTaken').value,
+    month: document.getElementById('monthSelect').value + ' ' + new Date().getFullYear(),
+    week: document.getElementById('weekSelect').value
+  };
+
+console.log(data);  // Log the data to see what is being sent
+
+  weekDays.forEach(day => {
+    const val = document.getElementById(day).value;
+    data[day] = val;
+    if (val !== '✔️') leaveCount++;
+  });
+
+  data.leaves = leaveCount;
+
+  fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams(data)
+  })
+  .then(res => res.json())
+  .then(response => {
+    console.log(response); // Log the response to inspect it
+    if (response.success) {
+      alert(editingNID ? 'Attendance updated.' : 'Attendance submitted.');
+      loadAttendance();
+      clearForm();
+    } else {
+      alert('Error: ' + response.error);
+    }
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+    alert('Network error. Please try again.');
+  });
+}
+
+    function clearForm() {
+      editingNID = null;
+      document.getElementById('submitBtn').textContent = 'Submit Attendance';
+      document.getElementById('submitBtn').className = 'btn btn-success';
+      
+	  document.getElementById('nid').readOnly = false; //enable editing
+	  
+	  const excludeIds = ['term', 'monthSelect', 'weekSelect', 'currentYear'];
+  document.querySelectorAll('.form-control').forEach(el => {
+    if (!el.hasAttribute('readonly') && !excludeIds.includes(el.id)) {
+      el.value = '';
+    }
+  });
+  // Clear department explicitly since it's readonly
+  document.getElementById('department').value = '';
+
+
+  // Reset days dropdowns to ✔️
+  ['sat', 'sun', 'mon', 'tue', 'wed', 'thu'].forEach(day => {
+    document.getElementById(day).value = '✔️';
+  });
+}
+
+function loadAttendance() {
+
+  const supervisorInput = document.getElementById('supervisor');
+  const supervisorName = supervisorInput.value.trim();
+
+  // Wait until supervisor name is loaded
+  if (!supervisorName || supervisorName === "Not Found") {
+    setTimeout(loadAttendance, 200); // Try again after 200ms
+    return;
+  }
+
+
+  const month = document.getElementById('monthSelect').value + ' ' + new Date().getFullYear();
+  const week = document.getElementById('weekSelect').value;
+
+  fetch(`${endpoint}?action=getSupervisorAttendance&month=${encodeURIComponent(month)}&week=${encodeURIComponent(week)}&supervisor=${encodeURIComponent(supervisorName)}`)
+
+  .then(res => res.json())
+  .then(data => {
+    const tbody = document.querySelector('#attendanceTable tbody');
+    tbody.innerHTML = '';
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.staffNID}</td><td>${row.name}</td><td>${row.department}</td><td>${row.supervisorName}</td>
+        <td>${row.week.sat}</td><td>${row.week.sun}</td><td>${row.week.mon}</td>
+        <td>${row.week.tue}</td><td>${row.week.wed}</td><td>${row.week.thu}</td>
+        <td>${row.leaves}</td><td>${row.missed}</td><td>${row.taken}</td>
+        <td>
+          <button class="btn btn-sm btn-primary" onclick='editRecord(${JSON.stringify(row)})'>Edit</button>
+          <button class="btn btn-sm btn-danger" onclick='deleteRecord("${row.staffNID}")'>Delete</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  });
+}
+
+
+    function editRecord(row) {
+      editingNID = row.nid;
+      document.getElementById('nid').value = row.staffNID;
+	  document.getElementById('nid').readOnly = true; // disable editing
+	  
+      document.getElementById('staffName').value = row.name;
+      document.getElementById('department').value = row.department;
+      document.getElementById('supervisor').value = row.supervisorName;
+
+      ['sat', 'sun', 'mon', 'tue', 'wed', 'thu'].forEach(day => {
+        document.getElementById(day).value = row.week[day];
+      });
+
+      document.getElementById('missedPeriods').value = row.missed;
+      document.getElementById('periodsTaken').value = row.taken;
+
+      document.getElementById('submitBtn').textContent = 'Update Attendance';
+      document.getElementById('submitBtn').className = 'btn btn-warning';
+    }
+
+function deleteRecord(nid) {
+  const supervisor = document.getElementById("supervisor").value;
+  const month = document.getElementById("monthSelect").value + ' ' + new Date().getFullYear();
+const week = document.getElementById("weekSelect").value;
+
+  if (confirm("Are you sure you want to delete this attendance record?")) {
+  
+console.log('Deleting:', nid, month, week);
+  
+    fetch(`${endpoint}?action=deleteAttendance`, {
+      method: 'POST',
+
+body: new URLSearchParams({
+  nid: nid,
+  month: month,
+  week: week
+})
+    })
+    .then(res => res.json())
+    .then(response => {
+      if (response.success) {
+        alert('Record deleted.');
+        loadAttendance();
+      } else {
+        alert('Delete failed: ' + response.error);
+      }
+    });
+  }
+}
+
+
+    window.onload = loadAttendance;
+
+
+  function updateTableHeader() {
+    const term = document.getElementById("term").value;
+    const currentYear = new Date().getFullYear();
+    document.getElementById("termHeader").textContent = `${term} / ${currentYear}`;
+	document.getElementById("currentYear").value = currentYear;
+
+    // Get Saturday of the current week
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+    const saturday = new Date(today);
+    saturday.setDate(today.getDate() - ((dayOfWeek + 1) % 7)); // Saturday
+    const thursday = new Date(saturday);
+    thursday.setDate(saturday.getDate() + 5);
+
+    const options = { month: 'short', day: 'numeric' };
+    const weekRangeText = `Week 1 (${saturday.toLocaleDateString(undefined, options)} - ${thursday.toLocaleDateString(undefined, options)})`;
+    document.getElementById("weekRange").textContent = weekRangeText;
+  }
+
+  // Call this when page loads
+  updateTableHeader();
+  loadAttendance();
+
+
+
+  </script>
+
+
+<script>
+  function updateHeader() {
+    const monthSelect = document.getElementById('monthSelect');
+    const weekSelect = document.getElementById('weekSelect');
+    const month = monthSelect.value;
+    const week = parseInt(weekSelect.value);
+    const year = new Date().getFullYear();
+
+    const monthIndex = new Date(`${month} 1, ${year}`).getMonth();
+    const firstDay = new Date(year, monthIndex, 1);
+
+    // Find the first Saturday
+    const firstSaturday = new Date(firstDay);
+    while (firstSaturday.getDay() !== 6) {
+      firstSaturday.setDate(firstSaturday.getDate() + 1);
+    }
+
+    // Start of selected week = first Saturday + (week - 1) * 7 days
+    const startDate = new Date(firstSaturday);
+    startDate.setDate(startDate.getDate() + (week - 1) * 7);
+
+    // End of selected week = start + 5 days (Saturday to Thursday)
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 5);
+
+    const options = { month: 'short', day: 'numeric' };
+    const startStr = startDate.toLocaleDateString('en-US', options);
+    const endStr = endDate.toLocaleDateString('en-US', options);
+
+    document.getElementById('weekRange').textContent = `Week ${week} (${startStr} – ${endStr})`;
+  }
+
+  // Run on load and when dropdowns change
+window.onload = () => {
+  updateHeader();
+  loadAttendance();
+
+  document.getElementById('monthSelect').addEventListener('change', () => {
+    updateHeader();
+    loadAttendance();
+  });
+
+  document.getElementById('weekSelect').addEventListener('change', () => {
+    updateHeader();
+    loadAttendance();
+  });
+};
+
+</script>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const today = new Date();
+  const currentMonthIndex = today.getMonth();
+  const currentMonthName = monthNames[currentMonthIndex];
+
+  // Update Month dropdown
+  const monthSelect = document.getElementById("monthSelect");
+  for (let option of monthSelect.options) {
+    if (option.value === currentMonthName) {
+      option.textContent = `${option.value} (Current Month)`;
+      monthSelect.value = option.value;
+    } else {
+      // Reset in case previously modified
+      option.textContent = option.value.replace(" (Current Month)", "");
+    }
+  }
+
+  // Week calculation
+  const firstOfMonth = new Date(today.getFullYear(), currentMonthIndex, 1);
+  const firstDay = firstOfMonth.getDay(); // 0 = Sun, 6 = Sat
+  const offsetToSaturday = (6 - firstDay + 7) % 7;
+  const firstSaturday = new Date(firstOfMonth);
+  firstSaturday.setDate(1 + offsetToSaturday);
+
+  const diffDays = Math.floor((today - firstSaturday) / (1000 * 60 * 60 * 24));
+  const weekNumber = diffDays >= 0 ? Math.floor(diffDays / 7) + 1 : 1;
+  const weekValue = Math.min(weekNumber, 5).toString();
+
+  // Update Week dropdown
+  const weekSelect = document.getElementById("weekSelect");
+  for (let option of weekSelect.options) {
+    if (option.value === weekValue) {
+      option.textContent = `Week ${option.value} (Current Week)`;
+      weekSelect.value = option.value;
+    } else {
+      option.textContent = `Week ${option.value}`;
+    }
+  }
+
+  updateHeader();
+  loadAttendance();
+});
+</script>
+
+
+
+</body>
+</html>

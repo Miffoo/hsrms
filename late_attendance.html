@@ -1,0 +1,809 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Marker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	
+
+
+
+
+    <style>
+        body {
+            background-color: #dff0d8;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #3c763d;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #3c763d;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+        }
+        .btn-primary:hover {
+            background-color: #2e6b2f;
+        }
+		.btn-secondary {
+            background-color: #0275d8;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .btn-secondary:hover {
+            background-color: #025aa5;
+        }
+        .btn-danger {
+            background-color: #d9534f;
+            border: none;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .btn-danger:hover {
+            background-color: #c9302c;
+        }
+		
+		
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #3c763d;
+            text-align: center;
+            line-height: 100px;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+        .conditional-input {
+            display: none;
+        }
+        .app-title {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 5px;
+            font-weight: bold;
+            font-family: "Georgia", serif;
+        }
+        .developer-credit {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 20px;
+            font-style: italic;
+            font-family: "Georgia", serif;
+        }
+        .clear-btn {
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            margin-left: 5px;
+        }
+        .clear-btn:hover {
+            background-color: #c9302c;
+        }
+        .font-adjust-section {
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-top: 1px solid #dcdcdc;
+            border-bottom: 1px solid #dcdcdc;
+        }
+        .font-adjust-section label {
+            font-size: 16px;
+            color: #3c763d;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+        .font-adjust-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .font-btn {
+            background-color: #3c763d;
+            color: white;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .font-btn:hover {
+            background-color: #2e6b2f;
+            transform: scale(1.1);
+        }
+		
+		
+		
+        .gear-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+        }
+        .gear-button img {
+            width: 30px;
+            height: 30px;
+        }
+        #settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .modal-button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+
+		.action-btn {
+        background-color: #5bc0de; /* Light blue */
+        color: white;
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        width: 50px;
+        text-align: center;
+        margin-left: -1px; /* Aligns with the input field */
+        border-radius: 0 4px 4px 0; /* Rounded edges only on the right */
+    }
+    .action-btn:hover {
+        background-color: #31b0d5; /* Darker blue */
+        color: white;
+        transform: scale(1.1); /* Slight zoom effect */
+        transition: 0.2s ease-in-out;
+    }
+		
+		
+		
+		   .invalid-input {
+        border: 2px solid red;
+    }
+
+    .error-message {
+        color: red;
+        font-size: 0.9em;
+        display: none;
+        margin-top: 5px;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+	 .shake {
+    animation: shake 0.3s;
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+	
+	
+	
+		
+	
+.uniform-btn {
+    width: 40px; /* Make all buttons the same width */
+    height: 40px; /* Make all buttons the same height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto; /* Push the button to the right */
+    text-align: center;
+    padding: 0; /* Remove padding for uniform appearance */
+    font-size: 16px; /* Adjust font size */
+    border-radius: 5px; /* Optional for rounded corners */
+}
+
+	
+	        .noticeboard {
+            margin: 20px 0;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #3c763d, #dff0d8);
+            color: white;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            position: relative;
+        }
+        .noticeboard-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .noticeboard-content {
+            font-size: 16px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+        .scrolling-text {
+            animation: scroll 10s linear infinite;
+            white-space: nowrap;
+        }
+        @keyframes scroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+	
+
+		
+    </style>
+	
+	<style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+	
+	
+	
+</head>
+
+
+
+<body>
+		
+
+
+    <div class="container">
+
+        <h1>Late Attendance</h1>
+
+
+        <div class="form-group">
+            <label for="classes">Classes:</label>
+            <input list="class-options" id="classes" class="form-control" onchange="loadStudents()">
+            <datalist id="class-options">
+                <!-- Options will be dynamically loaded -->
+            </datalist>
+        </div>
+		<div class="form-group">
+			<label for="students">Students:</label>
+				<div class="input-group">
+					<input list="student-options" id="students" class="form-control">
+						<datalist id="student-options">
+							<!-- Options will be dynamically loaded -->
+						</datalist>
+					
+				</div>
+
+		</div>
+		<div id="additional-student-list"></div>
+		
+       <div class="form-group">
+            <label for="date">Date:</label>
+            <input type="date" id="date" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="time-returned">Time Came To School:</label>
+            <div class="input-group">
+                <input type="time" id="time-returned" class="form-control">
+
+            </div>
+        </div>
+       
+
+
+
+
+
+
+
+<div class="form-group">
+    <label for="checkinTeacher">Attendance Marked By:</label>
+    <div class="input-group">
+        <label id="checkinTeacher" class="form-control"></label>
+    </div>
+</div>
+		
+		
+<div class="form-group" id="login-type-group">
+    <label for="nature">Login Type:</label>
+    <div id="login-type-field">
+        <!-- This will be replaced by JS depending on the role -->
+    </div>
+</div>
+		
+		
+		
+		<div class="form-group">
+    <label for="reason">Attendance Condition:</label>
+    <input type="text" id="reason" name="reason" class="form-control" value="Came Late to School" readonly>
+</div>
+		
+                        <div class="form-group">
+            <label for="otherReason">Reason late for school:</label>
+            <select id="otherReason" class="form-control" >
+                <option value="">Select Reason</option>
+                <option value="Bus late">Bus late</option>
+                <option value="Taxi late">Taxi late</option>		
+                <option value="Accident">Accident</option>	
+                <option value="Traffic jam">Traffic jam</option>					
+                <option value="Wake up late">Wake up late</option>
+                <option value="Parent late">Parent late</option>
+                <option value="Eating breakfast/lunch">Eating breakfast/lunch</option>
+				<option value="Had to pray">Had to pray</option>
+	            <option value="Not feeling well">Not feeling well</option>	
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+	
+        <button id="submit-button" class="btn btn-primary" onclick="submitExit()">Submit</button>
+		
+
+
+		<button class="btn btn-danger" onclick="navigateWithFade('prefects_landing_page.html')">Go Back</button>
+		
+		
+    </div>
+	
+
+    <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+<script>
+	
+	
+	 
+    const phoneNumber = localStorage.getItem('phoneNumber'); // Retrieve the phone number
+
+         const teacherScriptUrl = 'https://script.google.com/macros/s/AKfycbyqv1AJXS2gggrPUt82AMLVqpQsoa4fLwiQHb5OgiqkSrGdBxkjkr7R6aHyCCPkXINV/exec';
+        const classStudentScriptUrl = 'https://script.google.com/macros/s/AKfycbyrBUBAaEK0c_hmdsEXEZHRYfnZZsDMtVWfKIkbH_yp6DdO76wU1bpDxRc8EGiZH4Xg/exec';
+
+
+const CLASS_CACHE_KEY = 'cachedClasses';
+    const CLASS_CACHE_TIMESTAMP_KEY = 'classCacheTimestamp';
+    const CACHE_EXPIRY_DAYS = 1;
+        document.addEventListener('DOMContentLoaded', () => {
+            loadClasses();
+            setCurrentTime();
+            setCurrentDate();
+			populateTeacherName();
+        });
+
+    function loadClasses() {
+        const cachedClasses = localStorage.getItem(CLASS_CACHE_KEY);
+        const cacheTimestamp = localStorage.getItem(CLASS_CACHE_TIMESTAMP_KEY);
+        const now = new Date();
+
+        if (cachedClasses && cacheTimestamp) {
+            const cacheDate = new Date(parseInt(cacheTimestamp, 10));
+            const diffDays = (now - cacheDate) / (1000 * 60 * 60 * 24);
+
+            if (diffDays <= CACHE_EXPIRY_DAYS) {
+                // Use cached data if within the expiry period
+                populateClassOptions(JSON.parse(cachedClasses));
+                return;
+            }
+        }
+
+        // Fetch new data if cache is expired or not available
+        fetch(`${classStudentScriptUrl}?action=getClasses`)
+            .then(response => response.json())
+            .then(data => {
+                const classList = data.classes.slice(1); // Assuming first entry is header
+                localStorage.setItem(CLASS_CACHE_KEY, JSON.stringify(classList));
+                localStorage.setItem(CLASS_CACHE_TIMESTAMP_KEY, now.getTime().toString());
+                populateClassOptions(classList);
+            })
+            .catch(error => console.error('Error fetching classes:', error));
+    }
+
+    function populateClassOptions(classes) {
+        const classOptions = document.getElementById('class-options');
+        classOptions.innerHTML = ''; // Clear previous options
+        classes.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            classOptions.appendChild(option);
+        });
+    }
+
+
+
+function loadStudents() {
+    const className = document.getElementById('classes').value;
+    const studentInput = document.getElementById('students');
+    const studentOptions = document.getElementById('student-options');
+
+    if (!className) {
+        studentOptions.innerHTML = ''; // Clear options if no class selected
+		        studentInput.value = ''; // Clear the student input field
+        studentInput.style.backgroundColor = ''; // Reset background color
+        return;
+    }
+
+    studentInput.style.backgroundColor = 'lightcoral'; // Set loading indicator
+
+    fetch(`${classStudentScriptUrl}?action=getStudents&class=${encodeURIComponent(className)}`)
+        .then(response => response.json())
+        .then(data => {
+            studentOptions.innerHTML = ''; // Clear previous options
+            data.students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = `${student.SID} ${student.name}`; // Combine SID and name
+                studentOptions.appendChild(option);
+            });
+
+            studentInput.style.backgroundColor = 'lightgreen'; // Set success indicator
+        })
+        .catch(error => {
+            console.error('Error fetching students:', error);
+            studentInput.style.backgroundColor = ''; // Reset background on error
+        });
+}
+
+function validateStudentSelection(input) {
+    const studentOptions = input.list.options;
+    const inputValue = input.value;
+
+    const errorContainerId = `${input.id}-error-container`;
+    let errorContainer = document.getElementById(errorContainerId);
+
+    // Create an error container if it doesn't already exist
+    if (!errorContainer) {
+        errorContainer = document.createElement('div');
+        errorContainer.id = errorContainerId;
+        errorContainer.style.color = 'red';
+        errorContainer.style.marginTop = '5px'; // Add spacing above the error message
+        input.parentElement.parentElement.appendChild(errorContainer);
+    }
+
+    // Clear any existing error message
+    errorContainer.textContent = '';
+
+    const valid = Array.from(studentOptions).some(option => option.value === inputValue);
+    if (!valid) {
+        input.style.borderColor = 'red'; // Red border for invalid input
+        errorContainer.textContent = 'Please select a valid student from the list.';
+    } else {
+        input.style.borderColor = ''; // Reset border for valid input
+    }
+}
+
+function addNewStudentInput() {
+    const additionalList = document.getElementById('additional-student-list');
+
+    // Create a new input field for the additional student
+    const newInputGroup = document.createElement('div');
+    newInputGroup.className = 'input-group';
+    newInputGroup.style.marginTop = '10px'; // Add spacing between inputs
+
+    const newInput = document.createElement('input');
+    newInput.type = 'text';
+    newInput.className = 'form-control';
+    newInput.list = 'student-options';
+    newInput.setAttribute('onblur', 'validateStudentSelection(this)');
+
+    const newErrorContainer = document.createElement('div');
+    newErrorContainer.style.color = 'red';
+    newErrorContainer.style.marginTop = '5px';
+
+    // Append the new input and error container to the group
+    newInputGroup.appendChild(newInput);
+    newInputGroup.appendChild(newErrorContainer);
+
+    // Append the new group to the additional student list
+    additionalList.appendChild(newInputGroup);
+}
+
+function submitExit() {
+    const submitButton = document.getElementById('submit-button');
+    submitButton.disabled = true; // Disable the button initially
+
+    const dateInput = document.getElementById('date').value;
+    const timeReturned = document.getElementById('time-returned').value;
+    const checkinTeacher = document.getElementById('checkinTeacher').innerText;
+
+    const nature = document.getElementById('nature').value;
+    const reason = document.getElementById('reason').value;
+    const otherReason = document.getElementById('otherReason').value;
+
+    const date = new Date(dateInput);
+    const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    const selectedClass = document.getElementById('classes').value;
+    let scriptUrl;
+
+    if (/^1[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbyrBUBAaEK0c_hmdsEXEZHRYfnZZsDMtVWfKIkbH_yp6DdO76wU1bpDxRc8EGiZH4Xg/exec';
+    } else if (/^2[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbwhMHV-yWM-bTrp1idSP323BBdamQmxS-nmhpJcf2o60x5WiBEztYjkHhigo4LzIlUjDQ/exec';
+    } else if (/^3[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbzFJnA_V27gMLEJp-dzmpUlzSCsFUn7VHK1sYuaZlxM1amGwNwjIpu4Hk2WslB-RhkhRA/exec';
+    } else if (/^4[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycby8hKdwmEOYrF55tlekMqqGOcGQBR8URocyQQnnGjOWFdLZRyXTrbJc7-fC9xFBVA2z/exec';
+    } else if (/^5[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbwKVvKCQrbMTgSMjF1Boh9sCz4j43UkARo-Vo0VFT9AmcsgaznD8YjNms8lVdsEo9dXhw/exec';
+    } else if (/^6[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbyzfsx18UQnCBB7SX2t1cUgpchnIp3uTtdlzT0t2jugdPY8z1eBB7JmcXy_eue0pmI8kA/exec';
+    } else if (/^7[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbyDDKapvzCyz0wiSchQSgqHjyABJhfaknLzRpPtbQzOgUNQvMR2FKFM8P9eEi2igEWwzQ/exec';
+    } else if (/^8[A-Z]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbxg21krYHR6bKpgUuE0dPnD3e4BcrSFLwVoN89AxNgcTsTPAEBj_Wc0rYtsDgpQh0u1mA/exec';
+
+    } else if (/^8(S|B)[1-5]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbxg21krYHR6bKpgUuE0dPnD3e4BcrSFLwVoN89AxNgcTsTPAEBj_Wc0rYtsDgpQh0u1mA/exec';
+
+
+    } else if (/^9(S|B)[1-5]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbwZBCuNs_Bjcmrms53E6umA09NKjTepszb0BmhqJ75Ir70_z-quvvAkbvWUi1ELsRU8Wg/exec';
+    } else if (/^10(S|B)[1-5]$/.test(selectedClass)) {
+        scriptUrl = 'https://script.google.com/macros/s/AKfycbxUyvATG7ATIbTo5qR93eZXFdSTlsFMBHE62ey-rKwLTajpvkwIA345s9dydbOoOg_DBA/exec';
+    } else {
+        alert('Class selection not supported');
+        submitButton.disabled = false; // Re-enable the button
+        return;
+    }
+
+    const studentInputs = document.querySelectorAll('#students, #additional-student-list input');
+    const students = Array.from(studentInputs).map(input => input.value).filter(student => student);
+
+    if (students.length === 0) {
+        alert('Please add at least one student.');
+        submitButton.disabled = false; // Re-enable the button
+        return;
+    }
+
+    if (!nature) {
+        alert('Please select a login type.');
+        submitButton.disabled = false; // Re-enable the button
+        return;
+    }
+	
+	
+	if (!otherReason) {
+    alert('Please select the reason the student was late for school.');
+    submitButton.disabled = false; // Re-enable the button
+    return;
+}
+
+  // Function to submit data for a single student
+    const submitStudent = async (studentInfo) => {
+        const formData = new URLSearchParams();
+        formData.append('action', 'submitExit');
+        formData.append('date', formattedDate);
+        formData.append('students', studentInfo);
+        formData.append('timeReturned', timeReturned);
+        formData.append('checkinTeacher', checkinTeacher);
+        formData.append('nature', nature);
+        formData.append('reason', reason);
+		formData.append('otherReason', otherReason);
+		
+		
+
+        try {
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error('Error submitting student:', studentInfo, error);
+            throw error;
+        }
+    };
+
+    // Submit data sequentially
+    (async () => {
+        try {
+            for (const student of students) {
+                await submitStudent(student);
+            }
+            alert('All submissions successful!');
+            location.reload(); // Refresh the page
+        } catch (error) {
+            alert('Error submitting one or more entries. Please check the console for details.');
+        } finally {
+            submitButton.disabled = false; // Re-enable the button
+        }
+    })();
+}
+
+  function setCurrentTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeString = `${hours}:${minutes}`;
+        document.getElementById('time-returned').value = timeString;
+    }
+
+    function setCurrentDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // months are 0-based, so add 1
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+        document.getElementById('date').value = dateString;
+    }
+		
+		function clearTimeLeft() {
+			document.getElementById('time-returned').value = '';
+		}
+
+
+
+        // Logout functionality
+        function logout() {
+            localStorage.removeItem("teacherName");
+            localStorage.removeItem("phoneNumber");
+            alert("You have been logged out.");
+            window.location.href = "prefects_landing_page.html"; // Redirect to login page
+        }
+
+
+
+
+
+
+// Initial event listener for the main student input
+document.getElementById('students').addEventListener('blur', function () {
+    validateStudentSelection(this);
+});
+
+
+function populateTeacherName() {
+    const teacherName = localStorage.getItem('teacherName');
+    if (teacherName) {
+        document.getElementById('checkinTeacher').innerText = teacherName;
+    }
+}
+
+
+
+
+</script>
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const userRank = localStorage.getItem("userRank");
+    const loginTypeField = document.getElementById("login-type-field");
+
+    if (userRank === "TEACHER") {
+        loginTypeField.innerHTML = `
+            <select id="nature" class="form-control">
+                <option value="">Select Type</option>
+                <option value="ASSIGNED">Assigned Teacher</option>
+                <option value="RELIEF">Relief Teacher</option>
+            </select>
+        `;
+    } else if (userRank === "SMT" || userRank === "PREFECT") {
+        loginTypeField.innerHTML = `
+            <input type="text" id="nature" class="form-control" value="${userRank}" readonly>
+        `;
+    } else {
+        loginTypeField.innerHTML = `
+            <input type="text" id="nature" class="form-control" value="Unknown" readonly>
+        `;
+    }
+});
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const studentInput = document.getElementById("students");
+    const datalist = document.getElementById("student-options");
+
+    function getValidOptions() {
+        return Array.from(datalist.options).map(opt => opt.value);
+    }
+
+    studentInput.addEventListener("blur", function () {
+        const inputValue = studentInput.value.trim();
+        const validOptions = getValidOptions();
+
+        if (inputValue && !validOptions.includes(inputValue)) {
+            studentInput.classList.add("invalid-input", "shake");
+            studentInput.value = ""; // Clear only if invalid
+
+            setTimeout(() => {
+                studentInput.classList.remove("shake");
+            }, 300);
+        } else {
+            studentInput.classList.remove("invalid-input");
+        }
+    });
+});
+</script>
+
+
+
+
+
+
+</body>
+</html>

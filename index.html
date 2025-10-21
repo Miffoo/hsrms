@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSRMS</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #dff0d8;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 400px;
+            margin-top: 5px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h2 {
+            text-align: center;
+            color: #3c763d;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .btn-primary {
+            background-color: #3c763d;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2e6b2f;
+        }
+		
+		        .app-title {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 5px;
+            font-weight: bold;
+            font-family: "Georgia", serif;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #3c763d;
+            text-align: center;
+            line-height: 100px;
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+        }
+        .developer-credit {
+            text-align: center;
+            font-size: 12px;
+            color: #3c763d;
+            margin-top: 20px;
+            font-style: italic;
+            font-family: "Georgia", serif;
+        }
+
+        .rotate-arrow {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .rotate-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+.message-navigation {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    gap: 5px;
+}
+
+.nav-btn {
+    width: 36px;
+    background-color: #3c763d;
+    color: white;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #2e6b2f;
+}
+
+#messagePanel {
+    flex: 1;
+    max-height: 80px;
+    min-height: 80px;
+    background: #fefefe;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0;
+    display: flex;
+    justify-content: center;      /* Center horizontally */
+    align-items: center;          /* Center vertically when content is short */
+    overflow-y: auto;             /* KEEP vertical scroll */
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+    line-height: 1.2;
+    text-align: center;
+}
+
+#messagePanel ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+#messagePanel li {
+    margin: 0;
+    padding: 0;
+    color: #333;
+    line-height: 1.2;
+}
+
+#messagePanel li:first-child {
+    font-weight: 600;
+    color: #2e6b2f;
+    font-size: 14px;
+    line-height: 1.2;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+}
+
+.message-info {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 4px;
+}
+    </style>
+</head>
+<body>
+
+<div class="app-title">Huravee School Record Management System - V1.0</div>
+
+    <div class="container">
+        <!-- Arrow inside container at top right -->
+        <span class="rotate-arrow" onclick="clearCache()">
+            &#x21bb; <!-- Unicode for the refresh arrow -->
+        </span>
+
+        <div class="logo">HSRMS</div>
+
+        <h2>Huravee School Login</h2>
+
+<div class="message-navigation">
+    <button onclick="showPreviousMessage()" class="nav-btn left-btn">&lt;</button>
+
+    <div id="messagePanel">
+        <ul id="messageList"></ul>
+    </div>
+
+    <button onclick="showNextMessage()" class="nav-btn right-btn">&gt;</button>
+</div>
+
+<div class="message-info">
+    <span id="messageIndex">Message 1 of 0</span>
+</div>
+
+
+        <div class="form-group">
+            <label for="nid">NID:</label>
+            <input type="text" id="nid" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="rank">Rank:</label>
+            <select id="rank" class="form-control">
+                <option value="TEACHER">TEACHER</option>
+                <option value="SMT">SMT</option>
+                <option value="PREFECT">PREFECT</option>
+                <option value="ADMINISTRATOR">ADMINISTRATOR</option>
+            </select>
+        </div>
+        <center>
+            <button class="btn btn-primary btn-block" onclick="login()">Login</button>
+        </center>
+        <p id="error-message" class="error"></p>
+    </div>
+
+    <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+    <script>
+        let currentMessageIndex = 0; // Store the current message index
+        let totalMessages = 0; // Store the total number of messages
+        let messages = []; // Store the fetched messages
+
+        function login() {
+		
+		    const loginBtn = document.querySelector('.btn-primary');
+
+    // Disable button and change text
+    loginBtn.disabled = true;
+    loginBtn.textContent = "Logging in...";
+	
+            const nid = document.getElementById('nid').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rank = document.getElementById('rank').value;
+
+            const action = (rank === 'PREFECT') ? 'prefectLogin' : 'login';
+
+            fetch('https://script.google.com/macros/s/AKfycbyF-chbLKECGbRipS2ujNT0gabH_xwLWTNawqmFmpqF9xSHVIPWufkjJDkgalGn5Q0R/exec', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    action: action,
+                    nid: nid,
+                    password: password,
+                    rank: rank
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    localStorage.setItem('teacherName', data.teacherName); // Store the teacher's name
+                    localStorage.setItem('phoneNumber', nid); // Store the NID
+                    localStorage.setItem('isLoggedIn', 'true'); // Set login status
+                    localStorage.setItem('userRank', rank); // Store user rank
+
+                    if (rank === 'ADMINISTRATOR') {
+                        window.location.href = 'admin.html';
+                    } else if (rank === 'SMT') {
+                        window.location.href = 'smt_landing_page.html';
+                    } else if (rank === 'TEACHER') {
+                        window.location.href = 'teachers_landing_page.html';
+                    }
+                    else if (rank === 'PREFECT') {
+                        window.location.href = 'prefects_landing_page.html';
+                    }
+                } else {
+                    document.getElementById('error-message').innerText = data.error || 'Invalid login credentials.';
+			loginBtn.disabled = false;
+            loginBtn.textContent = "Login";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('error-message').innerText = 'An error occurred during login.';
+		loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
+            });
+        }
+
+        function clearCache() {
+            localStorage.clear();
+            document.querySelector('.rotate-arrow').classList.toggle('rotated');
+            alert("Cache cleared successfully!");
+        }
+
+        const webAppUrl = "https://script.google.com/macros/s/AKfycbyJi39HbEpFIHw7GarDsrdVV43v3ZoXbMYDm_NgUQoyCXzVnZEkUkpKyRWDlz9ZwJth/exec?action=getMessages";
+
+fetch(webAppUrl)
+    .then(res => res.json())
+    .then(data => {
+        const messageData = data.messages;
+
+        if (Array.isArray(messageData) && messageData.length >= 1) {
+            const row = messageData[0]; // Use the first (and only) row of actual data
+            const heading = row.col1 || 'No Heading';
+
+            messages = Array.from({ length: 10 }, (_, i) => {
+                return {
+                    heading: heading,
+                    text: row[`col${i + 2}`]
+                };
+            }).filter(msg => msg.text); // remove empty messages
+
+            totalMessages = messages.length;
+            document.getElementById('messageIndex').textContent = `Message 1 of ${totalMessages}`;
+            showMessage(currentMessageIndex);
+        } else {
+            console.error('No message data found');
+        }
+    })
+    .catch(err => console.error('Fetch Error:', err));
+
+	    // Declare globally so the HTML buttons can access them
+    function showNextMessage() {
+        if (currentMessageIndex < totalMessages - 1) {
+            currentMessageIndex++;
+            showMessage(currentMessageIndex);
+        }
+    }
+
+    function showPreviousMessage() {
+        if (currentMessageIndex > 0) {
+            currentMessageIndex--;
+            showMessage(currentMessageIndex);
+        }
+    }
+
+    function showMessage(index) {
+        const panel = document.getElementById('messagePanel');
+        const messageList = panel.querySelector('#messageList');
+        messageList.innerHTML = '';
+
+        const headingLi = document.createElement('li');
+        headingLi.textContent = `${messages[index].heading}`;
+        headingLi.style.fontWeight = 'bold';
+		        headingLi.style.marginBottom = '5px';
+
+
+        const messageLi = document.createElement('li');
+        messageLi.textContent = messages[index].text;
+
+        messageList.appendChild(headingLi);
+        messageList.appendChild(messageLi);
+
+        document.getElementById('messageIndex').textContent = `Message ${index + 1} of ${totalMessages}`;
+    }	
+		
+    </script>
+</body>
+</html>

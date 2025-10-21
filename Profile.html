@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Profile</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+<script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+
+
+
+ <style>
+    body {
+      background-color: #dff0d8;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      animation: fadeIn 0.5s ease-in;
+    }
+    .container {
+      max-width: 900px;
+      margin-top: 30px;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    h3 {
+      text-align: center;
+      color: #3c763d;
+      margin-bottom: 30px;
+    }
+    .profile-picture {
+      display: block;
+      margin: 0 auto 20px auto;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid #3c763d;
+    }
+    .form-group label {
+      color: #2e6b2f;
+      font-weight: bold;
+    }
+    .btn-primary {
+      background-color: #3c763d;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #2e6b2f;
+    }
+    .developer-credit {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #3c763d;
+      font-style: italic;
+      font-family: "Georgia", serif;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+	
+	  .badge {
+    font-size: 0.9rem;
+    padding: 0.5em 0.75em;
+    border-radius: 0.5rem;
+  }
+  
+  .form-label {
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+  <style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <h3>Staff Profile</h3>
+
+<img id="profileImage" src="" alt="" class="profile-picture">
+  <div class="form-group text-center mb-4">
+<input type="file" id="profilePic" class="form-control"
+       accept="image/*"
+       capture="environment">
+  </div>
+
+  <form id="profileForm">
+    <div class="row">
+
+  
+  
+  <div class="col-md-6">
+  <div class="border rounded p-3 mb-4 bg-light shadow-sm">
+    <h5 class="text-success mb-3">👤 Staff Information</h5>
+
+    <p><span class="badge bg-success me-2">Staff ID</span> 
+       <span class="badge bg-white text-success border" id="staffId"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Staff Name</span> 
+       <span class="badge bg-white text-success border" id="staffName"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Department</span> 
+       <span class="badge bg-white text-success border" id="department"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Class Teacher</span> 
+       <span class="badge bg-white text-success border" id="classTeacher"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Assistant Class Teacher</span> 
+       <span class="badge bg-white text-success border" id="assistantClassTeacher"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Subject Teacher</span> 
+       <span class="badge bg-white text-success border" id="subjectTeacher"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Supervisor</span> 
+       <span class="badge bg-white text-success border" id="supervisor"></span>
+    </p>
+
+    <p><span class="badge bg-success me-2">Permanent Address</span> 
+       <span class="badge bg-white text-success border" id="permanentAddress"></span>
+    </p>
+  </div>
+</div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+
+      <div class="col-md-6">
+  <div class="border rounded p-3 mb-4 bg-light shadow-sm">
+    <h5 class="text-success mb-3">📞 Contact & Emergency</h5>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="contactNumber">📱 Contact Number</label>
+      <input type="text" id="contactNumber" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="dob">🎂 Date of Birth</label>
+      <input type="date" id="dob" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="presentAddress">🏠 Present Address</label>
+      <input type="text" id="presentAddress" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="emergency1">📞 Emergency Contact 1</label>
+      <input type="text" id="emergency1" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="emergency2">📞 Emergency Contact 2</label>
+      <input type="text" id="emergency2" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="emergencyRelation">🧬 Relation</label>
+      <input type="text" id="emergencyRelation" class="form-control">
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="emergencyAddress">📍 Emergency Address</label>
+      <input type="text" id="emergencyAddress" class="form-control">
+    </div>
+
+    <h5 class="text-success mt-4 mb-3">🏥 Health Information</h5>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="health">💊 Health Issues</label>
+      <textarea id="health" class="form-control" rows="2"></textarea>
+    </div>
+
+    <div class="form-group mb-3">
+      <label class="form-label text-success fw-bold" for="bloodType">🩸 Blood Type</label>
+      <input type="text" id="bloodType" class="form-control">
+    </div>
+  </div>
+</div>
+      </div>
+
+<div class="d-grid gap-2">
+  <button type="button" id="updateBtn" class="btn btn-primary w-100" onclick="updateProfile()">Update Profile</button>
+
+<button type="button" class="btn btn-danger" onclick="navigateToLandingPage()">Back</button>
+
+</div>
+  </form>
+    </div>
+<div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+<script>
+function navigateToLandingPage() {
+  const rank = localStorage.getItem("userRank");
+
+  if (rank === "TEACHER") {
+    navigateWithFade('teachers_landing_page.html');
+  } else if (rank === "SMT") {
+    navigateWithFade('smt_landing_page.html');
+  } else {
+    alert("Access denied. Invalid rank.");
+    navigateWithFade('index.html'); // Optional: redirect to login
+  }
+}
+</script>
+
+<script>
+const profileUrl = "https://script.google.com/macros/s/AKfycbyWBkpEze8pGgKXdzmWyhCB89WWt6NbZHI3xKSO-eD-fpgfoQPma5esqcyZIE3PRo5H/exec";
+const staffNID = localStorage.getItem("phoneNumber");
+
+let base64Image = "";
+let imageType = "";
+let imageName = "";
+
+
+
+function loadProfile() {
+  fetch(`${profileUrl}?action=getUserInfo2&nid=${staffNID}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success || !data.user) {
+        alert("❌ Failed to load staff profile. Please check NID or try again.");
+        console.error("Response data:", data);
+        return;
+      }
+
+      const r = data.user;
+
+      document.getElementById("staffId").textContent = r[0];
+      document.getElementById("staffName").textContent = r[1];
+      document.getElementById("department").textContent = r[6];
+      document.getElementById("classTeacher").textContent = r[8];
+      document.getElementById("assistantClassTeacher").textContent = r[9];
+      document.getElementById("subjectTeacher").textContent = r[10];
+      document.getElementById("supervisor").textContent = r[12];
+      document.getElementById("permanentAddress").textContent = r[3];
+
+      document.getElementById("contactNumber").value = r[13] || "";
+
+const rawDob = r[4] || "";
+console.log("Raw DOB from spreadsheet:", rawDob);
+let formattedDob = "";
+
+if (rawDob.length === 7 || rawDob.length === 8) {
+  let mm, dd, yyyy;
+
+  if (rawDob.length === 7) {
+    // Example: "8271990" → mm = "08", dd = "27", yyyy = "1990"
+    mm = "0" + rawDob.charAt(0);
+    dd = rawDob.substring(1, 3);
+    yyyy = rawDob.substring(3);
+  } else {
+    mm = rawDob.substring(0, 2);
+    dd = rawDob.substring(2, 4);
+    yyyy = rawDob.substring(4);
+  }
+
+  formattedDob = `${yyyy}-${mm}-${dd}`;
+  console.log("Formatted DOB string:", formattedDob);
+}
+
+const dobInput = document.getElementById("dob");
+console.log("DOB input element:", dobInput);
+if (dobInput) {
+  dobInput.value = formattedDob;
+} else {
+  console.warn("DOB input element not found!");
+}
+
+document.getElementById("dob").value = formattedDob;
+
+
+      document.getElementById("presentAddress").value = r[14] || "";
+      document.getElementById("emergency1").value = r[15] || "";
+      document.getElementById("emergency2").value = r[16] || "";
+      document.getElementById("emergencyRelation").value = r[17] || "";
+      document.getElementById("emergencyAddress").value = r[18] || "";
+      document.getElementById("health").value = r[19] || "";
+      document.getElementById("bloodType").value = r[20] || "";
+
+      if (r[21] && r[21].includes("id=")) {
+        const fileId = r[21].split("id=")[1].split("&")[0];
+        const imageUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w300`;
+
+        const profileImg = document.getElementById("profileImage");
+        profileImg.onerror = () => window.open(imageUrl, "_blank");
+        profileImg.src = imageUrl;
+      }
+    })
+    .catch(err => {
+      console.error("Profile load error:", err);
+      alert("❌ Error loading profile. Please try again.");
+    });
+}
+
+function updateProfile() {
+  const updateBtn = document.getElementById("updateBtn");
+
+  // Disable button and show loading spinner
+  updateBtn.disabled = true;
+  updateBtn.innerHTML =
+    'Updating... <span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>';
+
+  const formData = new FormData();
+  formData.append("action", "updateUserInfo2");
+  formData.append("nid", staffNID);
+
+  // ✅ Convert YYYY-MM-DD → MMDDYYYY for saving to spreadsheet
+  const dobInput = document.getElementById("dob").value;
+  let dobToSave = "";
+  if (dobInput && dobInput.includes("-")) {
+    const [yyyy, mm, dd] = dobInput.split("-");
+    dobToSave = `${mm}${dd}${yyyy}`;
+  }
+  formData.append("dob", dobToSave);
+
+  formData.append("contactNumber", document.getElementById("contactNumber").value);
+  formData.append("presentAddress", document.getElementById("presentAddress").value);
+  formData.append("emergency1", document.getElementById("emergency1").value);
+  formData.append("emergency2", document.getElementById("emergency2").value);
+  formData.append("emergencyRelation", document.getElementById("emergencyRelation").value);
+  formData.append("emergencyAddress", document.getElementById("emergencyAddress").value);
+  formData.append("health", document.getElementById("health").value);
+  formData.append("bloodType", document.getElementById("bloodType").value);
+
+  // Add image only if selected
+  if (base64Image) {
+    formData.append("imageBase64", base64Image);
+    formData.append("imageType", imageType);
+    formData.append("imageName", imageName);
+  }
+
+  fetch(profileUrl, {
+    method: "POST",
+    body: formData,
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("✅ Profile updated successfully.");
+        location.reload();
+      } else {
+        alert("❌ Failed to update profile.");
+      }
+    })
+    .catch(err => {
+      console.error("Update error:", err);
+      alert("❌ An error occurred.");
+    })
+    .finally(() => {
+      updateBtn.disabled = false;
+      updateBtn.innerHTML = "Update Profile";
+      base64Image = ""; // Reset image variable
+    });
+}
+
+loadProfile();
+
+</script>
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+<script>
+document.getElementById("profilePic").addEventListener("change", function () {
+  const file = this.files[0];
+  if (!file) return;
+
+  imageType = file.type;
+  imageName = file.name;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const result = e.target.result;
+    base64Image = result.split(",")[1]; // Extract base64 string
+    document.getElementById("profileImage").src = result; // Preview image
+  };
+  reader.readAsDataURL(file);
+});
+</script>
+
+
+</body>
+</html>

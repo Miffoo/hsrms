@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+    <script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+  
+  
+  <style>
+    body {
+      background-color: #dff0d8;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 800px;
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #3c763d;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      background-color: #3c763d;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #2e6b2f;
+    }
+    .result-card {
+      display: none;
+      margin-top: 30px;
+    }
+    .card-title {
+      color: #3c763d;
+    }
+    .developer-credit {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #3c763d;
+      font-style: italic;
+      font-family: "Georgia", serif;
+    }
+  </style>
+  
+  <style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+  
+  
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Student Profile</h1>
+
+<div class="form-group">
+  <label for="classes">Classes:</label>
+  <select id="classes" class="form-control" onchange="loadStudents()" required>
+    <option value="" disabled selected>Select a class</option>
+
+    <!-- Grades 1 to 8: A-Z -->
+    <option value="1A">1A</option><option value="1B">1B</option><option value="1C">1C</option><option value="1D">1D</option><option value="1E">1E</option><option value="1F">1F</option><option value="1G">1G</option><option value="1H">1H</option><option value="1I">1I</option><option value="1J">1J</option><option value="1K">1K</option><option value="1L">1L</option><option value="1M">1M</option><option value="1N">1N</option><option value="1O">1O</option><option value="1P">1P</option><option value="1Q">1Q</option><option value="1R">1R</option><option value="1S">1S</option><option value="1T">1T</option><option value="1U">1U</option><option value="1V">1V</option><option value="1W">1W</option><option value="1X">1X</option><option value="1Y">1Y</option><option value="1Z">1Z</option>
+
+    <option value="2A">2A</option><option value="2B">2B</option><option value="2C">2C</option><option value="2D">2D</option><option value="2E">2E</option><option value="2F">2F</option><option value="2G">2G</option><option value="2H">2H</option><option value="2I">2I</option><option value="2J">2J</option><option value="2K">2K</option><option value="2L">2L</option><option value="2M">2M</option><option value="2N">2N</option><option value="2O">2O</option><option value="2P">2P</option><option value="2Q">2Q</option><option value="2R">2R</option><option value="2S">2S</option><option value="2T">2T</option><option value="2U">2U</option><option value="2V">2V</option><option value="2W">2W</option><option value="2X">2X</option><option value="2Y">2Y</option><option value="2Z">2Z</option>
+
+    <option value="3A">3A</option><option value="3B">3B</option><option value="3C">3C</option><option value="3D">3D</option><option value="3E">3E</option><option value="3F">3F</option><option value="3G">3G</option><option value="3H">3H</option><option value="3I">3I</option><option value="3J">3J</option><option value="3K">3K</option><option value="3L">3L</option><option value="3M">3M</option><option value="3N">3N</option><option value="3O">3O</option><option value="3P">3P</option><option value="3Q">3Q</option><option value="3R">3R</option><option value="3S">3S</option><option value="3T">3T</option><option value="3U">3U</option><option value="3V">3V</option><option value="3W">3W</option><option value="3X">3X</option><option value="3Y">3Y</option><option value="3Z">3Z</option>
+
+	<option value="4A">4A</option><option value="4B">4B</option><option value="4C">4C</option><option value="4D">4D</option><option value="4E">4E</option><option value="4F">4F</option><option value="4G">4G</option><option value="4H">4H</option><option value="4I">4I</option><option value="4J">4J</option><option value="4K">4K</option><option value="4L">4L</option><option value="4M">4M</option><option value="4N">4N</option><option value="4O">4O</option><option value="4P">4P</option><option value="4Q">4Q</option><option value="4R">4R</option><option value="4S">4S</option><option value="4T">4T</option><option value="4U">4U</option><option value="4V">4V</option><option value="4W">4W</option><option value="4X">4X</option><option value="4Y">4Y</option><option value="4Z">4Z</option>
+
+	<option value="5A">5A</option><option value="5B">5B</option><option value="5C">5C</option><option value="5D">5D</option><option value="5E">5E</option><option value="5F">5F</option><option value="5G">5G</option><option value="5H">5H</option><option value="5I">5I</option><option value="5J">5J</option><option value="5K">5K</option><option value="5L">5L</option><option value="5M">5M</option><option value="5N">5N</option><option value="5O">5O</option><option value="5P">5P</option><option value="5Q">5Q</option><option value="5R">5R</option><option value="5S">5S</option><option value="5T">5T</option><option value="5U">5U</option><option value="5V">5V</option><option value="5W">5W</option><option value="5X">5X</option><option value="5Y">5Y</option><option value="5Z">5Z</option>
+
+	<option value="6A">6A</option><option value="6B">6B</option><option value="6C">6C</option><option value="6D">6D</option><option value="6E">6E</option><option value="6F">6F</option><option value="6G">6G</option><option value="6H">6H</option><option value="6I">6I</option><option value="6J">6J</option><option value="6K">6K</option><option value="6L">6L</option><option value="6M">6M</option><option value="6N">6N</option><option value="6O">6O</option><option value="6P">6P</option><option value="6Q">6Q</option><option value="6R">6R</option><option value="6S">6S</option><option value="6T">6T</option><option value="6U">6U</option><option value="6V">6V</option><option value="6W">6W</option><option value="6X">6X</option><option value="6Y">6Y</option><option value="6Z">6Z</option>
+
+	<option value="7A">7A</option><option value="7B">7B</option><option value="7C">7C</option><option value="7D">7D</option><option value="7E">7E</option><option value="7F">7F</option><option value="7G">7G</option><option value="7H">7H</option><option value="7I">7I</option><option value="7J">7J</option><option value="7K">7K</option><option value="7L">7L</option><option value="7M">7M</option><option value="7N">7N</option><option value="7O">7O</option><option value="7P">7P</option><option value="7Q">7Q</option><option value="7R">7R</option><option value="7S">7S</option><option value="7T">7T</option><option value="7U">7U</option><option value="7V">7V</option><option value="7W">7W</option><option value="7X">7X</option><option value="7Y">7Y</option><option value="7Z">7Z</option>
+
+	<option value="8A">8A</option><option value="8B">8B</option><option value="8C">8C</option><option value="8D">8D</option><option value="8E">8E</option><option value="8F">8F</option><option value="8G">8G</option><option value="8H">8H</option><option value="8I">8I</option><option value="8J">8J</option><option value="8K">8K</option><option value="8L">8L</option><option value="8M">8M</option><option value="8N">8N</option><option value="8O">8O</option><option value="8P">8P</option><option value="8Q">8Q</option><option value="8R">8R</option><option value="8S">8S</option><option value="8T">8T</option><option value="8U">8U</option><option value="8V">8V</option><option value="8W">8W</option><option value="8X">8X</option><option value="8Y">8Y</option><option value="8Z">8Z</option>
+
+
+    <!-- Grade 9 -->
+    <option value="9S1">9S1</option><option value="9S2">9S2</option><option value="9S3">9S3</option><option value="9S4">9S4</option><option value="9S5">9S5</option><option value="9S6">9S6</option><option value="9S7">9S7</option>
+    <option value="9B1">9B1</option><option value="9B2">9B2</option><option value="9B3">9B3</option><option value="9B4">9B4</option><option value="9B5">9B5</option><option value="9B6">9B6</option><option value="9B7">9B7</option>
+
+    <!-- Grade 10 -->
+    <option value="10S1">10S1</option><option value="10S2">10S2</option><option value="10S3">10S3</option><option value="10S4">10S4</option><option value="10S5">10S5</option><option value="10S6">10S6</option><option value="10S7">10S7</option>
+    <option value="10B1">10B1</option><option value="10B2">10B2</option><option value="10B3">10B3</option><option value="10B4">10B4</option><option value="10B5">10B5</option><option value="10B6">10B6</option><option value="10B7">10B7</option>
+  </select>
+</div>
+
+
+
+		<div class="form-group">
+			<label for="students">Students:</label>
+				<div class="input-group">
+					<input list="student-options" id="students" class="form-control">
+						<datalist id="student-options">
+							<!-- Options will be dynamically loaded -->
+						</datalist>
+					
+				</div>
+
+		</div>
+				<input type="text" id="studentnid" name="studentnid" class="form-control" readonly hidden />	
+		<center><div id="nidStatus" class="text-muted mt-2" style="display: none;">Getting Student NID...</div></center>
+		<div class="mt-2">
+    <button class="btn btn-primary w-100" onclick="searchStudent()">Search</button>
+	</div>
+	
+	<div class="mt-2">
+<button class="btn btn-secondary w-100" onclick="clearForm()">Clear</button>
+	</div>
+	<div class="mt-3">
+
+		    <button class="btn btn-danger" style="width: 100%;"  onclick="navigateWithFade('smt_landing_page.html')">Go Back</button>
+	</div>
+
+<div class="progress my-3" style="height: 25px; display: none;" id="searchProgressWrapper">
+  <div id="searchProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%">Searching...</div>
+</div>
+
+
+    <div id="resultCard" class="card result-card">
+      <div class="card-header bg-success text-white"><center>Misuse of any document will result in serious concequences.</center></div>
+      <div class="card-body" id="studentInfo"></div>
+    </div>
+
+
+  </div>
+    <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+<script>
+
+
+
+const phoneNumber = localStorage.getItem('phoneNumber'); // Retrieve the phone number
+
+const teacherScriptUrl = 'https://script.google.com/macros/s/AKfycbyqv1AJXS2gggrPUt82AMLVqpQsoa4fLwiQHb5OgiqkSrGdBxkjkr7R6aHyCCPkXINV/exec';
+const classStudentScriptUrl = 'https://script.google.com/macros/s/AKfycbzegnGbhZtUxqycRTeLbjcjrBkYJY5Pe-s-KnZVAvp8rjZ_Etn-5MuEea0O_2B0jCMV/exec';
+
+document.addEventListener('DOMContentLoaded', () => {
+ 
+});
+
+const classScriptUrl = "https://script.google.com/macros/s/AKfycbyCP9RRaEOLXQL8diuejhiCF3Py083hQ9gL0ez4pPHC4fa36p9DeGhBeMn1F7m2VrWG/exec";
+
+
+
+
+
+
+function loadStudents() {
+    const className = document.getElementById('classes').value;
+    const studentInput = document.getElementById('students');
+    const studentOptions = document.getElementById('student-options');
+
+    if (!className) {
+        studentOptions.innerHTML = ''; // Clear options if no class selected
+		        studentInput.value = ''; // Clear the student input field
+        studentInput.style.backgroundColor = ''; // Reset background color
+        return;
+    }
+
+    studentInput.style.backgroundColor = 'lightcoral'; // Set loading indicator
+
+    fetch(`${classStudentScriptUrl}?action=getStudents&class=${encodeURIComponent(className)}`)
+        .then(response => response.json())
+        .then(data => {
+            studentOptions.innerHTML = ''; // Clear previous options
+            data.students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = `${student.SID} ${student.name}`; // Combine SID and name
+                studentOptions.appendChild(option);
+            });
+
+            studentInput.style.backgroundColor = 'lightgreen'; // Set success indicator
+        })
+        .catch(error => {
+            console.error('Error fetching students:', error);
+            studentInput.style.backgroundColor = ''; // Reset background on error
+        });
+}
+
+
+document.getElementById('students').addEventListener('change', function () {
+  const studentValue = this.value;
+  const indexMatch = studentValue.match(/^(HS\d+)\s+/);
+  const nidField = document.getElementById('studentnid');
+  const nidStatus = document.getElementById('nidStatus');
+  nidStatus.style.display = 'block';
+  nidStatus.innerText = 'Getting Student NID...';
+
+  if (!indexMatch) {
+    nidField.value = '';
+    nidStatus.innerText = 'Invalid selection.';
+    return;
+  }
+
+  const studentIndex = indexMatch[1];
+
+  fetch(`${classStudentScriptUrl}?action=getStudentNID&index=${encodeURIComponent(studentIndex)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        nidField.value = data.nid;
+        nidStatus.innerText = 'Student NID received.';
+      } else {
+        nidField.value = '';
+        nidStatus.innerText = 'NID not found.';
+      }
+    })
+    .catch(error => {
+      console.error('Error retrieving NID:', error);
+      nidField.value = '';
+      nidStatus.innerText = 'Error fetching NID.';
+    });
+});
+
+
+</script>
+
+
+  <script>
+function searchStudent() {
+  const studentId = document.getElementById("studentnid").value;
+  const className = document.getElementById("classes").value;
+  const infoContainer = document.getElementById("studentInfo");
+  const resultCard = document.getElementById("resultCard");
+
+  if (!studentId || !className || studentId === 'Not Found' || studentId === 'Error') {
+    alert("Please select a valid student.");
+    return;
+  }
+
+  const progressWrapper = document.getElementById('searchProgressWrapper');
+  const progressBar = document.getElementById('searchProgressBar');
+  progressWrapper.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressBar.innerText = '0%';
+  resultCard.style.display = 'none';
+
+  let progress = 0;
+  const progressInterval = setInterval(() => {
+    if (progress < 95) {
+      progress += Math.random() * 2 + 1; // Smooth realistic increase
+      progressBar.style.width = `${Math.floor(progress)}%`;
+      progressBar.innerText = `${Math.floor(progress)}%`;
+    }
+  }, 100);
+
+  const endpoint = `https://script.google.com/macros/s/AKfycbyW3byvauBIgA2xQlV-56mOTW9t6CxsoUANEVolzZ1b0TTVOvJ70GUij_XJjRaSGOu3RA/exec?action=searchStudent&studentId=${encodeURIComponent(studentId)}&className=${encodeURIComponent(className)}`;
+
+  fetch(endpoint)
+    .then(res => res.json())
+    .then(data => {
+      clearInterval(progressInterval);
+      progressBar.style.width = '100%';
+      progressBar.innerText = '100%';
+
+      setTimeout(() => {
+        progressWrapper.style.display = 'none';
+        if (data.success && data.fileUrl) {
+          infoContainer.innerHTML = `
+            <div class="text-success mb-2">Student record found:</div>
+            <iframe src="${data.fileUrl}" width="100%" height="600" frameborder="0" allowfullscreen></iframe>
+          `;
+        } else {
+          infoContainer.innerHTML = '<div class="text-danger">No student record found.</div>';
+        }
+        resultCard.style.display = 'block';
+      }, 500); // Delay to simulate 100% progress
+    })
+    .catch(() => {
+      clearInterval(progressInterval);
+      progressBar.classList.remove('bg-success');
+      progressBar.classList.add('bg-danger');
+      progressBar.innerText = 'Failed';
+      setTimeout(() => {
+        progressWrapper.style.display = 'none';
+      }, 1000);
+      infoContainer.innerHTML = '<div class="text-danger">Error fetching data. Please try again later.</div>';
+      resultCard.style.display = 'block';
+    });
+}
+
+function clearForm() {
+  document.getElementById("classes").value = '';
+  document.getElementById("students").value = '';
+  document.getElementById("studentnid").value = '';
+  document.getElementById("studentnid").style.backgroundColor = '';
+  document.getElementById("studentInfo").innerHTML = '';
+  document.getElementById("resultCard").style.display = 'none';
+  document.getElementById("searchProgressWrapper").style.display = 'none';
+  document.getElementById("nidStatus").style.display = 'none'; 
+  document.getElementById("nidStatus").innerText = '';        
+}
+
+
+</script>
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SBM</title>
+
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+  
+  
+  <style>
+    body {
+      background-color: #dff0d8;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+    }
+    .container {
+      max-width: 800px;
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #3c763d;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .btn-primary {
+      background-color: #3c763d;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #2e6b2f;
+    }
+    .result-card {
+      display: none;
+      margin-top: 30px;
+    }
+    .card-title {
+      color: #3c763d;
+    }
+    .developer-credit {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #3c763d;
+      font-style: italic;
+      font-family: "Georgia", serif;
+    }
+	
+	
+	#viewPanel {
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+  </style>
+  
+  <style>
+    body.fade-out {
+        opacity: 0;
+        transition: opacity 0.5s ease-out;
+    }
+
+    body.fade-in {
+        opacity: 0;
+        animation: fadeIn 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+  
+  
+</head>
+<body>
+
+    <div class="container">
+
+        <h1>Student Behaviour Monitoring</h1>
+
+<!-- Toggle View Panel Button -->
+<div class="text-center my-3">
+
+<button id="toggleViewPanel" class="btn btn-outline-info" onclick="togglePanels()">View panel</button>
+
+
+</div>
+
+
+
+<div class="form-group">
+  <label for="date">Date:</label>
+  <input type="date" class="form-control" id="date">
+</div>
+
+
+
+        <div class="form-group">
+            <label for="classes">Classes:</label>
+            <input list="class-options" id="classes" class="form-control" onchange="loadStudents()">
+            <datalist id="class-options">
+                <!-- Options will be dynamically loaded -->
+            </datalist>
+        </div>
+		<div class="form-group">
+			<label for="students">Students:</label>
+				<div class="input-group">
+					<input list="student-options" id="students" class="form-control">
+						<datalist id="student-options">
+							<!-- Options will be dynamically loaded -->
+						</datalist>
+					
+				</div>
+
+		</div>
+
+<input type="hidden" id="sid">
+<input type="hidden" id="sname">
+
+<div class="form-group">
+  <label for="nid">NID:</label>
+  <input type="text" class="form-control" id="nid" readonly>
+</div>
+
+<div class="form-group">
+  <label for="staffName">LT Name:</label>
+  <input type="text" class="form-control" id="staffName" readonly>
+</div>
+
+<div class="form-group">
+  <label for="issue">Select or Enter Behavior Issue:</label>
+  <input list="issueOptions" id="issue" name="issue" class="form-control" required placeholder="Select or type behavior issue">
+  <datalist id="issueOptions">
+    <option value="Talking back to teachers">
+    <option value="Ignoring instructions or refusing to comply">
+    <option value="Rolling eyes, making rude gestures, or mocking">
+    <option value="Constant talking or interrupting lessons">
+    <option value="Making loud noises or distracting others">
+    <option value="Moving around the class without permission">
+    <option value="Fighting or physical aggression">
+    <option value="Physical violence on teachers">	
+    <option value="Pushing, hitting, or throwing objects">
+    <option value="Threatening or intimidating other students">
+    <option value="Threatening or intimidating teachers">
+    <option value="Name-calling, teasing, or spreading rumors">
+    <option value="Targeting students based on skin color, or disability">
+    <option value="Copying homework or test answers">
+    <option value="Lying to avoid consequences">
+    <option value="Forging signatures on notes or reports">
+    <option value="Damaging school property (vandalism)">
+    <option value="Stealing from other students or classrooms">
+    <option value="Swearing or using offensive slang">
+    <option value="Making inappropriate jokes or comments">
+    <option value="Gesturing in a vulgar or disrespectful way">
+    <option value="Smoking or vaping on school grounds">
+    <option value="Using or possessing drugs ^(-_-)^">
+    <option value="Frequently skipping class">
+    <option value="Leaving school without permission">
+    <option value="Hiding in bathrooms or out-of-bound areas">
+    <option value="Using phones or other unrelated items to school">
+  </datalist>
+</div>
+
+
+
+<div class="form-group">
+  <label for="actionTaken">Action Taken:</label>
+  <textarea class="form-control" id="actionTaken" rows="3" required></textarea>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="informedLT" onchange="toggleLTName()">
+  <label class="form-check-label" for="informedLT">Informed LT</label>
+</div>
+
+<div class="form-group" id="ltNameGroup" style="display:none;">
+  <label for="ltName">Informed LT Name:</label>
+  <select class="form-control" id="ltName">
+    <option value="">-- Select --</option>
+  </select>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="informedClassteacher">
+  <label class="form-check-label" for="informedClassteacher">Informed Class Teacher</label>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="informedParent">
+  <label class="form-check-label" for="informedParent">Informed Parent</label>
+</div>
+
+<div class="form-check mb-2">
+  <input class="form-check-input" type="checkbox" id="dFormFilled" onchange="toggleDFormUpload()">
+  <label class="form-check-label" for="dFormFilled">D Form Filled</label>
+</div>
+
+<div class="form-group" id="dFormGroup" style="display:none;">
+  <label for="dFormFile">Upload D Form:</label>
+  <input type="file" class="form-control" id="dFormFile" accept="image/*">
+</div>
+
+
+
+		<div class="mt-2">
+    <button id="submitBtn" class="btn btn-primary w-100" onclick="submitBehavior(event)">Submit</button>
+	</div>
+	
+	
+	
+	
+	<div class="mt-2">
+<button class="btn btn-secondary w-100" onclick="clearForm()">Clear</button>
+	</div>
+
+	<div class="mt-2">
+      <button type="button" class="btn btn-danger w-100" onclick="navigateWithFade('smt_landing_page.html')">Back</button>
+	  	</div>
+	  
+	  
+
+<div class="container mt-4">
+
+<input type="hidden" id="editingRecordId">
+
+
+
+
+  <h2 class="text-center">Your Submissions</h2>
+  <div class="table-responsive">
+<table class="table table-bordered table-hover text-center align-middle" id="recordsTable">
+  <thead class="table-success">
+    <tr>
+      <th style="display:none; vertical-align: middle;">Record ID</th>
+      <th style="vertical-align: middle;">Date</th>
+      <th style="vertical-align: middle;">Class</th>
+      <th style="vertical-align: middle;">Student Name</th>
+      <th style="vertical-align: middle;">D Form Filled</th>
+      <th style="vertical-align: middle;">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="recordsBody">
+    <!-- Records will be populated dynamically -->
+  </tbody>
+</table>
+
+  </div>
+</div>
+
+  </div>
+  
+  
+  
+<!-- View Panel Container (Initially Hidden) -->
+<div id="viewPanel" class="container mt-4" style="display: none;">
+  <div class="card border-info shadow-sm">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">📊 Student Behavior Statistics</h4>
+      <button class="btn btn-sm btn-outline-light" onclick="togglePanels()">× Close</button>
+    </div>
+    <div class="card-body">
+      <div class="form-group mb-3">
+      <div class="form-group mb-3">
+        <label for="viewClasses" class="form-label">Select Class:</label>
+        <input list="view-class-options" id="viewClasses" class="form-control" onchange="loadBehaviorStudents()">
+        <datalist id="view-class-options">
+  <!-- 1A to 8Z -->
+  <option value="1A"><option value="1B"><option value="1C"><option value="1D"><option value="1E"><option value="1F"><option value="1G"><option value="1H"><option value="1I"><option value="1J"><option value="1K"><option value="1L"><option value="1M"><option value="1N"><option value="1O"><option value="1P"><option value="1Q"><option value="1R"><option value="1S"><option value="1T"><option value="1U"><option value="1V"><option value="1W"><option value="1X"><option value="1Y"><option value="1Z">
+  <option value="2A"><option value="2B"><option value="2C"><option value="2D"><option value="2E"><option value="2F"><option value="2G"><option value="2H"><option value="2I"><option value="2J"><option value="2K"><option value="2L"><option value="2M"><option value="2N"><option value="2O"><option value="2P"><option value="2Q"><option value="2R"><option value="2S"><option value="2T"><option value="2U"><option value="2V"><option value="2W"><option value="2X"><option value="2Y"><option value="2Z">
+  <option value="3A"><option value="3B"><option value="3C"><option value="3D"><option value="3E"><option value="3F"><option value="3G"><option value="3H"><option value="3I"><option value="3J"><option value="3K"><option value="3L"><option value="3M"><option value="3N"><option value="3O"><option value="3P"><option value="3Q"><option value="3R"><option value="3S"><option value="3T"><option value="3U"><option value="3V"><option value="3W"><option value="3X"><option value="3Y"><option value="3Z">
+  <option value="4A"><option value="4B"><option value="4C"><option value="4D"><option value="4E"><option value="4F"><option value="4G"><option value="4H"><option value="4I"><option value="4J"><option value="4K"><option value="4L"><option value="4M"><option value="4N"><option value="4O"><option value="4P"><option value="4Q"><option value="4R"><option value="4S"><option value="4T"><option value="4U"><option value="4V"><option value="4W"><option value="4X"><option value="4Y"><option value="4Z">
+  <option value="5A"><option value="5B"><option value="5C"><option value="5D"><option value="5E"><option value="5F"><option value="5G"><option value="5H"><option value="5I"><option value="5J"><option value="5K"><option value="5L"><option value="5M"><option value="5N"><option value="5O"><option value="5P"><option value="5Q"><option value="5R"><option value="5S"><option value="5T"><option value="5U"><option value="5V"><option value="5W"><option value="5X"><option value="5Y"><option value="5Z">
+  <option value="6A"><option value="6B"><option value="6C"><option value="6D"><option value="6E"><option value="6F"><option value="6G"><option value="6H"><option value="6I"><option value="6J"><option value="6K"><option value="6L"><option value="6M"><option value="6N"><option value="6O"><option value="6P"><option value="6Q"><option value="6R"><option value="6S"><option value="6T"><option value="6U"><option value="6V"><option value="6W"><option value="6X"><option value="6Y"><option value="6Z">
+  <option value="7A"><option value="7B"><option value="7C"><option value="7D"><option value="7E"><option value="7F"><option value="7G"><option value="7H"><option value="7I"><option value="7J"><option value="7K"><option value="7L"><option value="7M"><option value="7N"><option value="7O"><option value="7P"><option value="7Q"><option value="7R"><option value="7S"><option value="7T"><option value="7U"><option value="7V"><option value="7W"><option value="7X"><option value="7Y"><option value="7Z">
+  <option value="8A"><option value="8B"><option value="8C"><option value="8D"><option value="8E"><option value="8F"><option value="8G"><option value="8H"><option value="8I"><option value="8J"><option value="8K"><option value="8L"><option value="8M"><option value="8N"><option value="8O"><option value="8P"><option value="8Q"><option value="8R"><option value="8S"><option value="8T"><option value="8U"><option value="8V"><option value="8W"><option value="8X"><option value="8Y"><option value="8Z">
+
+  <!-- 9S1–7, 10S1–7 -->
+  <option value="9S1"><option value="9S2"><option value="9S3"><option value="9S4"><option value="9S5"><option value="9S6"><option value="9S7">
+  <option value="10S1"><option value="10S2"><option value="10S3"><option value="10S4"><option value="10S5"><option value="10S6"><option value="10S7">
+
+  <!-- 9B1–7, 10B1–7 -->
+  <option value="9B1"><option value="9B2"><option value="9B3"><option value="9B4"><option value="9B5"><option value="9B6"><option value="9B7">
+  <option value="10B1"><option value="10B2"><option value="10B3"><option value="10B4"><option value="10B5"><option value="10B6"><option value="10B7">
+</datalist>
+      </div>
+      </div>
+
+
+
+
+
+
+
+      <div class="form-group mb-3">
+        <label for="viewStudents" class="form-label">Select Student:</label>
+        <input list="view-student-options" id="viewStudents" class="form-control" onchange="loadStudentStats()">
+        <datalist id="view-student-options"></datalist>
+      </div>
+
+
+<div class="form-group mb-3">
+  <label for="gradeSelect" class="form-label">Or Select Grade:</label>
+  <select id="gradeSelect" class="form-control" onchange="loadGradeStats()">
+    <option value="">-- Select a Grade --</option>
+    <option value="1">Grade 1</option>
+    <option value="2">Grade 2</option>
+    <option value="3">Grade 3</option>
+    <option value="4">Grade 4</option>
+    <option value="5">Grade 5</option>
+    <option value="6">Grade 6</option>
+    <option value="7">Grade 7</option>
+    <option value="8">Grade 8</option>
+    <option value="9">Grade 9</option>
+    <option value="10">Grade 10</option>
+  </select>
+</div>
+
+
+
+
+  <div class="text-end mt-2">
+    <center><button class="btn btn-sm btn-outline-danger" onclick="clearViewPanel()">Clear View Panel</button></center>
+  </div>
+</div>
+
+      <div id="studentStats" style="display: none;">
+        <div class="alert alert-success" role="alert">
+          <center><strong>Total Issues Reported:</strong> <strong><span id="totalIssues">0</span></strong></center>
+          <center><strong>Total D Formed Filled:</strong> <strong><span id="totalDForms">0</span></strong></center>		  
+        </div>
+
+        <center><h5 class="text-primary">Behavior Records</h5></center>
+        <div class="table-responsive">
+<table class="table table-striped table-bordered text-center">
+  <thead class="table-info">
+    <tr>
+      <th class="align-middle">Date</th>
+      <th class="align-middle">Student</th>
+      <th class="align-middle">Class</th>	  
+      <th class="align-middle">Staff</th>
+      <th class="align-middle">Issue</th>
+      <th class="align-middle">Action</th>
+      <th class="align-middle">Informed LT</th>
+      <th class="align-middle">LT Name</th>
+      <!-- <th class="align-middle">LT Review</th> -->
+      <th class="align-middle">Informed Class Teacher</th>
+      <th class="align-middle">Informed Parent</th>
+      <th class="align-middle">D Form</th>
+    </tr>
+  </thead>
+  <tbody id="statsTableBody"></tbody>
+</table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+<script>
+
+
+
+
+
+const phoneNumber = localStorage.getItem('phoneNumber'); // Retrieve the phone number
+
+const teacherScriptUrl = 'https://script.google.com/macros/s/AKfycbyqv1AJXS2gggrPUt82AMLVqpQsoa4fLwiQHb5OgiqkSrGdBxkjkr7R6aHyCCPkXINV/exec';
+const classStudentScriptUrl = 'https://script.google.com/macros/s/AKfycbzegnGbhZtUxqycRTeLbjcjrBkYJY5Pe-s-KnZVAvp8rjZ_Etn-5MuEea0O_2B0jCMV/exec';
+
+document.addEventListener('DOMContentLoaded', () => {
+  const phoneNumber = localStorage.getItem('phoneNumber');
+  if (phoneNumber) {
+    document.getElementById('nid').value = phoneNumber;
+loadGrid();
+  } else {
+    console.warn('No phone number found in local storage.');
+  }
+
+  loadClasses();
+recallUserName();
+loadSMTNames();
+
+});
+
+const classScriptUrl = "https://script.google.com/macros/s/AKfycbyCP9RRaEOLXQL8diuejhiCF3Py083hQ9gL0ez4pPHC4fa36p9DeGhBeMn1F7m2VrWG/exec";
+
+function loadClasses() {
+  const phoneNumber = localStorage.getItem('phoneNumber');
+
+  fetch(`${classScriptUrl}?action=getClasses&phoneNumber=${encodeURIComponent(phoneNumber)}`)
+
+    .then(response => response.json())
+    .then(data => {
+      const classList = data.classes.slice(1); // Skip "Class" dummy
+      populateClassOptions(classList);
+    })
+    .catch(error => console.error('Error fetching classes:', error));
+}
+
+
+function populateClassOptions(classes) {
+  const classOptions = document.getElementById('class-options');
+  classOptions.innerHTML = ''; // Clear previous options
+
+  if (classes.length === 0) {
+    const option = document.createElement('option');
+    option.value = "No assigned classes";
+    classOptions.appendChild(option);
+  } else {
+    classes.forEach(className => {
+      const option = document.createElement('option');
+      option.value = className;
+      classOptions.appendChild(option);
+    });
+  }
+}
+
+
+
+function loadStudents() {
+    const className = document.getElementById('classes').value;
+    const studentInput = document.getElementById('students');
+    const studentOptions = document.getElementById('student-options');
+
+    if (!className) {
+        studentOptions.innerHTML = ''; // Clear options if no class selected
+		        studentInput.value = ''; // Clear the student input field
+        studentInput.style.backgroundColor = ''; // Reset background color
+        return;
+    }
+
+    studentInput.style.backgroundColor = 'lightcoral'; // Set loading indicator
+
+    fetch(`${classStudentScriptUrl}?action=getStudents&class=${encodeURIComponent(className)}`)
+        .then(response => response.json())
+        .then(data => {
+            studentOptions.innerHTML = ''; // Clear previous options
+            data.students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = `${student.SID} ${student.name}`; // Combine SID and name
+                studentOptions.appendChild(option);
+            });
+
+            studentInput.style.backgroundColor = 'lightgreen'; // Set success indicator
+        })
+        .catch(error => {
+            console.error('Error fetching students:', error);
+            studentInput.style.backgroundColor = ''; // Reset background on error
+        });
+}
+
+
+
+function recallUserName() {
+    const nid = localStorage.getItem('phoneNumber'); // or document.getElementById('nid').value;
+    if (!nid) {
+        console.warn('No NID found to recall staff name.');
+        return;
+    }
+
+    fetch(`https://script.google.com/macros/s/AKfycbxcif2M0iA6aZS3MB-XUNRg6ifXKFFCNhwly3llzuI-005QEv0BN3mfibBK4uTDvOu8/exec?action=getUserDetails&nid=${nid}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('staffName').value = data.name; // Set value, not innerText
+            } else {
+                console.error('Failed to get staff name:', data.message);
+            }
+        })
+        .catch(error => console.error('Error recalling user name:', error));
+}
+
+
+
+
+
+function loadSMTNames() {
+  const scriptUrl = 'https://script.google.com/macros/s/AKfycbwSoJbCylpHsxEnhH56Ag71GM6Gvcle2HuqjJHAXhUBaIW6uo1mgV7F_5ntAVq1J6Nu/exec';
+
+  fetch(`${scriptUrl}?action=getSMTNames`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const ltNameSelect = document.getElementById('ltName');
+        ltNameSelect.innerHTML = '<option value="">-- Select --</option>'; // Clear existing + default option
+        data.smtNames.forEach(name => {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          ltNameSelect.appendChild(option);
+        });
+      } else {
+        console.error('Failed to load SMT names:', data.message);
+      }
+    })
+    .catch(error => console.error('Error loading SMT names:', error));
+}
+
+
+
+
+
+
+</script>
+
+
+
+
+<script>
+    // When the page loads, fade in
+    document.addEventListener("DOMContentLoaded", () => {
+        document.body.classList.add("fade-in");
+    });
+
+    // Smooth navigation handler
+    function navigateWithFade(url) {
+        document.body.classList.remove("fade-in");
+        document.body.classList.add("fade-out");
+
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500); // Match the transition time
+    }
+</script>
+
+
+
+
+<script>
+let submitInProgress = false;
+
+ document.addEventListener("DOMContentLoaded", () => {
+  const dateInput = document.getElementById("date");
+  if (!dateInput.value) {
+    const today = new Date();
+    const yyyyMmDd = today.toISOString().split("T")[0]; // e.g., "2025-06-15"
+    dateInput.value = yyyyMmDd;
+  }
+    const nid = localStorage.getItem("nid");
+    const name = localStorage.getItem("name");
+    if (nid) document.getElementById("nid").value = nid;
+    if (name) document.getElementById("staffName").value = name;
+
+  document.getElementById("students").addEventListener("change", () => {
+    const val = document.getElementById("students").value;
+    const parts = val.split(" "); // e.g., "HS1234567 John Doe"
+    const sid = parts[0]; // SID
+    const sname = parts.slice(1).join(" "); // Rest is student name
+    document.getElementById("sid").value = sid;
+    document.getElementById("sname").value = sname;
+  });
+});
+
+  function toggleDFormUpload() {
+    const checked = document.getElementById("dFormFilled").checked;
+    document.getElementById("dFormGroup").style.display = checked ? 'block' : 'none';
+  }
+
+function toggleLTName() {
+  const checked = document.getElementById("informedLT").checked;
+  document.getElementById("ltNameGroup").style.display = checked ? 'block' : 'none';
+}
+
+
+  function clearForm() {
+document.getElementById("classes").value = '';
+    document.getElementById("students").value = '';
+    document.getElementById("sid").value = '';
+    document.getElementById("sname").value = '';
+    document.getElementById("issue").value = '';
+    document.getElementById("actionTaken").value = '';
+    document.getElementById("informedLT").checked = false;
+    document.getElementById("ltName").value = '';
+    document.getElementById("informedClassteacher").checked = false;
+    document.getElementById("informedParent").checked = false;
+    document.getElementById("dFormFilled").checked = false;
+    document.getElementById("dFormFile").value = '';
+
+  const recordIdField = document.getElementById("recordId");
+  if (recordIdField) recordIdField.value = "";
+
+    toggleDFormUpload();
+  }
+
+function toggleLTName() {
+  const informedLT = document.getElementById('informedLT').checked;
+  const ltNameGroup = document.getElementById('ltNameGroup');
+  const ltName = document.getElementById('ltName');
+
+  if (informedLT) {
+    ltNameGroup.style.display = 'block';
+  } else {
+    ltNameGroup.style.display = 'none';
+    ltName.value = ''; // Clear the selection when unchecked
+  }
+}
+function submitBehavior(event) {
+  if (event) event.preventDefault();
+  if (submitInProgress) return;
+  submitInProgress = true;
+
+  const submitBtn = document.getElementById("submitBtn");
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerText = "Submitting...";
+  }
+
+
+  const sid = document.getElementById("sid").value.trim();
+  const studentName = document.getElementById("sname").value.trim();
+  const className = document.getElementById("classes").value.trim();
+  const nid = document.getElementById("nid").value.trim();
+  const staffName = document.getElementById("staffName").value.trim();
+  const issue = document.getElementById("issue").value.trim();
+  const action = document.getElementById("actionTaken").value.trim();
+  const informedLT = document.getElementById("informedLT").checked ? 'Yes' : 'No';
+  const ltName = document.getElementById("ltName").value.trim();
+  const informedClassTeacher = document.getElementById("informedClassteacher").checked ? 'Yes' : 'No';
+  const informedParent = document.getElementById("informedParent").checked ? 'Yes' : 'No';
+  const dFormFilled = document.getElementById("dFormFilled").checked ? 'Yes' : 'No';
+  const dFormFile = document.getElementById("dFormFile").files[0];
+
+  const recordId = document.getElementById("editingRecordId")?.value;
+
+
+  // 🔸 Required field check
+  if (!sid || !studentName || !className || !nid || !staffName || !issue || !action) {
+    alert("Please fill all required fields.");
+    resetSubmitButton();
+    return;
+  }
+
+  // 🔸 LT Name validation
+  if (informedLT === "Yes" && ltName === "") {
+    alert("Please select an LT name.");
+    resetSubmitButton();
+    return;
+  }
+
+  // 🔸 D Form file validation
+  if (dFormFilled === "Yes" && !dFormFile) {
+    alert("Please upload the D Form file.");
+    resetSubmitButton();
+    return;
+  }
+
+  const formData = {
+    date: document.getElementById("date").value,
+    sid,
+    studentName,
+    class: className,
+    nid,
+    staffName,
+    issue,
+    actionTaken: action,
+    informedLT,
+    ltName,
+    informedClassteacher: informedClassTeacher,
+    informedParent,
+    dFormFilled
+  };
+
+  const isEditing = !!recordId;
+  if (isEditing) formData.recordId = recordId;
+
+  const payload = new FormData();
+  payload.append("action", isEditing ? "update" : "submit");
+  payload.append("formData", JSON.stringify(formData));
+  payload.append("hasFile", dFormFilled === "Yes" && dFormFile ? "true" : "false");
+
+  if (dFormFilled === "Yes" && dFormFile) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      const base64Data = event.target.result.split(',')[1];
+      payload.append("fileData", base64Data);
+      payload.append("mimeType", dFormFile.type);
+      payload.append("fileName", dFormFile.name);
+      sendForm(payload, isEditing);
+    };
+    reader.readAsDataURL(dFormFile);
+  } else {
+    sendForm(payload, isEditing);
+  }
+}
+
+// 🔁 Helper to reset button UI
+function resetSubmitButton() {
+  submitInProgress = false;
+  const submitBtn = document.getElementById("submitBtn");
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Submit";
+  }
+}
+
+function sendForm(data, isEditing) {
+
+  fetch("https://script.google.com/macros/s/AKfycbx_sOzfLHWdOd8jcxnLEj6CPSGcvvvndguQ6lBWxiWWUQnzZ-1Ax7kQsLfb83Khmh_F/exec", {
+    method: "POST",
+    body: data
+  })
+    .then(res => res.json())
+    .then(result => {
+      submitInProgress = false;
+
+      const submitBtn = document.getElementById("submitBtn");
+      if (submitBtn) {
+        submitBtn.innerText = isEditing ? "Updated!" : "Submitted!";
+      }
+
+      if (result.status === "success") {
+        alert(isEditing ? "Record updated successfully." : "Submitted successfully.");
+         
+        if (typeof fetchUserRecords === "function") {
+          fetchUserRecords(document.getElementById("nid").value);
+        }
+        setTimeout(() => location.reload(), 1000); // Refresh page after 1s
+      } else {
+        alert("Submission failed: " + result.message);
+        resetSubmitButton();
+      }
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert("Submission failed due to a network error.");
+      resetSubmitButton();
+    });
+}
+
+
+
+</script>
+
+
+<script>
+
+
+function loadGrid() {
+  const nid = document.getElementById("nid").value;
+  if (!nid) return;
+
+  fetch("https://script.google.com/macros/s/AKfycbx_sOzfLHWdOd8jcxnLEj6CPSGcvvvndguQ6lBWxiWWUQnzZ-1Ax7kQsLfb83Khmh_F/exec", {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "getUserRecords",
+      nid: nid
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      renderGrid(data.records);
+    } else {
+      console.error("Error loading records:", data.message);
+    }
+  });
+}
+function renderGrid(records) {
+  const tbody = document.getElementById("recordsBody");
+  tbody.innerHTML = "";
+
+  records.forEach(record => {
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td style="display:none;">${record.recordId}</td> <!-- Keep visible for testing -->
+      <td>${record.date}</td>
+      <td>${record.class}</td>
+      <td>${record.studentName}</td>
+	  <td>${record.dFormFilled}</td>
+	  
+	  
+      <td>
+        <button class="btn btn-sm btn-warning" onclick="editRecordById('${record.recordId}')"> Edit </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteRecordById('${record.recordId}')"> Delete </button>
+      </td>
+    `;
+
+    tbody.appendChild(row);
+  });
+}
+
+
+
+
+
+
+
+function editRecordById(recordId) {
+console.log("Editing record ID:", recordId);
+  fetch("https://script.google.com/macros/s/AKfycbx_sOzfLHWdOd8jcxnLEj6CPSGcvvvndguQ6lBWxiWWUQnzZ-1Ax7kQsLfb83Khmh_F/exec", {
+    method: "POST",
+    body: new URLSearchParams({
+      action: "getRecordById",
+      recordId: recordId
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      const record = data.record;
+
+      // Populate form fields with the record data
+      document.getElementById("date").value = record[0];
+      document.getElementById("sid").value = record[1];
+      document.getElementById("students").value = record[2];
+      document.getElementById("sname").value = record[2];
+      document.getElementById("classes").value = record[3];
+      document.getElementById("nid").value = record[4];
+      document.getElementById("staffName").value = record[5];
+      document.getElementById("issue").value = record[6];
+      document.getElementById("actionTaken").value = record[7];
+      document.getElementById("informedLT").checked = record[8] === "Yes";
+      document.getElementById("ltName").value = record[9];
+      document.getElementById("informedClassteacher").checked = record[11] === "Yes";
+      document.getElementById("informedParent").checked = record[12] === "Yes";
+      document.getElementById("dFormFilled").checked = record[13] === "Yes";
+
+      // Show/hide LT and D Form sections based on state
+      toggleLTName();
+      toggleDFormUpload();
+
+  // Disable editable fields
+      document.getElementById("date").readOnly = true;
+      document.getElementById("classes").readOnly = true;
+      document.getElementById("students").readOnly = true;
+
+
+document.getElementById("editingRecordId").value = recordId;
+
+      // Update submit button
+      document.getElementById("submitBtn").innerText = "Update Record";
+
+    } else {
+      alert("Failed to load record.");
+    }
+  })
+  .catch(err => {
+    console.error("Error loading record:", err);
+  });
+}
+
+
+
+function deleteRecordById(recordId) {
+  if (!recordId) {
+    alert("Missing record ID.");
+    return;
+  }
+
+  if (confirm("Are you sure you want to delete this record?")) {
+    const formData = new URLSearchParams();
+    formData.append("action", "delete");
+    formData.append("recordId", recordId);
+
+    fetch("https://script.google.com/macros/s/AKfycbx_sOzfLHWdOd8jcxnLEj6CPSGcvvvndguQ6lBWxiWWUQnzZ-1Ax7kQsLfb83Khmh_F/exec", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: formData
+    })
+    .then(res => res.json())
+    .then(json => {
+      if (json.status === "success") {
+        alert("✅ Record deleted successfully.");
+        setTimeout(() => location.reload(), 1000); // Reload after 1 second
+      } else {
+        alert("❌ Failed to delete: " + json.message);
+      }
+    })
+    .catch(error => {
+      console.error("Delete error:", error);
+      alert("❌ Network or server error.");
+    });
+  }
+}
+
+
+</script>
+
+
+<script>
+  function toggleOtherInput(select) {
+    const otherInputGroup = document.getElementById("otherIssueGroup");
+    if (select.value === "other") {
+      otherInputGroup.style.display = "block";
+      document.getElementById("otherIssue").setAttribute("required", "required");
+    } else {
+      otherInputGroup.style.display = "none";
+      document.getElementById("otherIssue").removeAttribute("required");
+    }
+  }
+</script>
+
+
+
+
+
+
+<script>
+
+function togglePanels() {
+  const viewPanel = document.getElementById('viewPanel');
+  const formContainer = document.querySelector('.container');
+  const toggleBtn = document.getElementById('toggleViewPanel');
+
+  if (viewPanel.style.display === 'none' || viewPanel.classList.contains('d-none')) {
+    // Open panel
+    viewPanel.classList.remove('d-none');
+    viewPanel.style.display = 'block';
+    formContainer.style.display = 'none';
+    toggleBtn.textContent = 'Close view panel';
+
+    // Only load class options once
+    if (!document.getElementById('view-class-options').children.length) {
+      loadViewClasses();
+    }
+  } else {
+    // Close and clear view panel
+    clearViewPanel(); // 👈 call reset here
+    viewPanel.classList.add('d-none');
+    formContainer.style.display = 'block';
+    toggleBtn.textContent = 'View panel';
+  }
+}
+
+function clearViewPanel() {
+  document.getElementById('viewClasses').value = '';
+  document.getElementById('viewStudents').value = '';
+  document.getElementById('gradeSelect').value = '';  
+  document.getElementById('totalIssues').textContent = '0';
+  document.getElementById('statsTableBody').innerHTML = '';
+  document.getElementById('studentStats').style.display = 'none';
+  document.getElementById('view-student-options').innerHTML = '';
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const teachersScriptUrl = 'https://script.google.com/macros/s/AKfycbx_sOzfLHWdOd8jcxnLEj6CPSGcvvvndguQ6lBWxiWWUQnzZ-1Ax7kQsLfb83Khmh_F/exec'; // your deployed URL
+
+function loadBehaviorStudents() {
+  const selectedClass = document.getElementById('viewClasses').value;
+  const datalist = document.getElementById('view-student-options');
+  const viewStudentsInput = document.getElementById('viewStudents');
+
+  fetch(teachersScriptUrl, {
+    method: 'POST',
+    body: new URLSearchParams({
+      action: 'getViewRecords',
+      class: selectedClass
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    datalist.innerHTML = '';
+    viewStudentsInput.value = ''; // clear selected student
+
+    if (!data.records || data.records.length === 0) {
+      // Showin no-records message in place of datalist
+      const opt = document.createElement('option');
+      opt.value = 'No Records Filled';
+      datalist.appendChild(opt);
+
+      // disable student input if needed
+      viewStudentsInput.placeholder = 'No Records Filled';
+      viewStudentsInput.disabled = true;
+
+      // hide student stats section too
+      document.getElementById('studentStats').style.display = 'none';
+      return;
+    }
+
+    // Enable student input if previously disabled
+    viewStudentsInput.disabled = false;
+    viewStudentsInput.placeholder = 'Select Student';
+
+    const studentList = new Set(data.records.map(r => r.studentName));
+    studentList.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      datalist.appendChild(opt);
+    });
+  })
+  .catch(err => {
+    console.error('Failed to load students for view', err);
+    datalist.innerHTML = '';
+    viewStudentsInput.placeholder = 'Error loading records';
+    viewStudentsInput.disabled = true;
+  });
+}
+
+
+
+function formatDateOnly(isoString) {
+  const date = new Date(isoString);
+  return date.toISOString().split('T')[0]; // → 'YYYY-MM-DD'
+}
+
+function loadStudentStats() {
+  const studentName = document.getElementById('viewStudents').value;
+  const selectedClass = document.getElementById('viewClasses').value;
+
+  fetch(teachersScriptUrl, {
+    method: 'POST',
+    body: new URLSearchParams({
+      action: 'getViewRecords', // ✅ FIXED
+      class: selectedClass
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    const filtered = data.records.filter(r => r.studentName === studentName); // ✅ match Apps Script
+    document.getElementById('totalIssues').textContent = filtered.length;
+    const tbody = document.getElementById('statsTableBody');
+    tbody.innerHTML = '';
+
+    let dFormCount = 0;
+
+
+    filtered.forEach(row => {
+	      if (row.dFormFilled === 'Yes') dFormCount++;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${formatDateOnly(row.date)}</td>
+		<td>${row.studentName}</td>
+        <td>${row.class}</td>
+        <td>${row.staffName}</td>
+        <td>${row.issue}</td>
+        <td>${row.actionTaken}</td>
+        <td>${row.informedLT}</td>
+        <td>${row.ltName || '-'}</td>
+        <!-- <td>${row.ltReview || '-'}</td> -->
+        <td>${row.informedClassteacher}</td>
+        <td>${row.informedParent}</td>
+        <td>${
+          row.dFormFilled === 'Yes'
+            ? `<a href="${row.fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>`
+            : '-'
+        }</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('totalDForms').textContent = dFormCount;
+    document.getElementById('studentStats').style.display = 'block';
+  })
+  .catch(err => console.error('Failed to load student stats', err));
+}
+
+
+
+
+
+function loadGradeStats() {
+  const grade = document.getElementById('gradeSelect').value;
+  const classPrefixes = [];
+
+  if (grade >= 1 && grade <= 8) {
+    for (let i = 65; i <= 90; i++) {
+      classPrefixes.push(`${grade}${String.fromCharCode(i)}`);
+    }
+  } else if (grade == 9) {
+    for (let i = 1; i <= 7; i++) {
+      classPrefixes.push(`9S${i}`, `9B${i}`);
+    }
+  } else if (grade == 10) {
+    for (let i = 1; i <= 7; i++) {
+      classPrefixes.push(`10S${i}`, `10B${i}`);
+    }
+  }
+
+  fetch(teachersScriptUrl, {
+    method: 'POST',
+    body: new URLSearchParams({
+      action: 'getViewRecords',
+      class: 'ALL' // signal to backend to send all
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      const filtered = data.records.filter(r => classPrefixes.includes(r.class));
+      displayStats(filtered);
+    })
+    .catch(err => console.error('Failed to load grade stats', err));
+}
+
+
+
+function displayStats(records) {
+  const tbody = document.getElementById('statsTableBody');
+  tbody.innerHTML = '';
+  document.getElementById('studentStats').style.display = 'block';
+  
+    let dFormCount = 0;
+  
+  document.getElementById('totalIssues').textContent = records.length;
+
+  if (records.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9">No Records Found</td></tr>';
+    return;
+  }
+
+  records.forEach(row => {
+      if (row.dFormFilled === 'Yes') dFormCount++;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${formatDateOnly(row.date)}</td>
+	  <td>${row.studentName}</td>
+      <td>${row.class}</td>
+      <td>${row.staffName}</td>
+      <td>${row.issue}</td>
+      <td>${row.actionTaken}</td>
+      <td>${row.informedLT}</td>
+      <td>${row.ltName || '-'}</td>
+      <td>${row.informedClassteacher}</td>
+      <td>${row.informedParent}</td>
+      <td>${
+        row.dFormFilled === 'Yes'
+          ? `<a href="${row.fileUrl}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>`
+          : '-'
+      }</td>
+    `;
+    tbody.appendChild(tr);
+  });
+    document.getElementById('totalDForms').textContent = dFormCount;
+}
+
+
+</script>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
