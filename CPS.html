@@ -1,0 +1,1351 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Class Status</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <style>
+
+    :root{
+     
+      --field-width: 235px;
+      --button-width: 70px;
+      --table-width: 520px;
+      --table-inner-width: 380px;
+
+     
+      --cell-size: 96px;
+    }
+
+    body {
+      background-color: #dff0d8;
+      font-family: Arial, sans-serif;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    h4, h5 {
+      text-align: center;
+      color: #3c763d;
+      margin-top: 4px;
+      margin-bottom: 16px;
+    }
+
+    .form-group { margin-bottom: 12px; }
+    .btn-primary { background-color: #3c763d; border: none; }
+    .btn-primary:hover { background-color: #2e6b2f; }
+    .developer-credit {
+      text-align: center; margin: 12px 0 24px;
+      font-size: 12px; color: #3c763d; font-style: italic; font-family: "Georgia", serif;
+    }
+
+ 
+    .form-group .form-control,
+    .form-group .form-select,
+    .form-group textarea.form-control {
+      width: min(100%, var(--field-width));
+      display: inline-block;
+    }
+
+    .pane .btn {
+      width: min(100%, var(--button-width)) !important;
+      display: block;
+      margin: 0 auto;
+      white-space: nowrap;
+    }
+
+    .btn-row{
+      display: flex;
+      gap: .5rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
+      margin-top: .5rem;
+    }
+    .btn-row .btn{ margin: 0 !important; display: inline-flex; align-items: center; justify-content: center; }
+
+
+    .split-card {
+      width: min(100vw - 16px, 1200px);
+      margin: 20px auto 0;
+      background-color: #fff;
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .pane {
+      min-width: 0;
+      background: #fff;
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 0 0 rgba(0,0,0,0);
+      max-height: calc(100vh - 120px);
+      overflow: auto;
+    }
+
+    .split-card > .pane-left  { flex: 0 0 25%; max-width: 25%; }
+    .split-card > .pane-right { flex: 1 1 55%; max-width: 55%; }
+
+
+    @media (max-width: 992px) {
+      .split-card { gap: 12px; }
+      .split-card > .pane-left  { flex-basis: 25%; max-width: 25%; }
+      .split-card > .pane-right { flex-basis: 55%; max-width: 55%; }
+    }
+
+   
+    @media (max-width: 768px) {
+      .split-card { flex-direction: column; padding: 12px; }
+      .split-card > .pane-left,
+      .split-card > .pane-right { flex: 0 0 auto; max-width: 100%; }
+      .pane { max-height: none; }
+      h4, h5 { margin-bottom: 10px; }
+    }
+
+    .inline-fields {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+      flex-wrap: nowrap;
+      justify-content: center; 
+    }
+    .inline-fields .form-group { flex: 0 0 auto; margin: 0; }
+    .form-group label { display: block; margin-bottom: 0.35rem; }
+
+   
+    .pane-left .table-responsive { max-width: var(--table-width); margin: 0 auto; }
+    .pane-left .table { width: min(100%, var(--table-inner-width)) !important; margin: 0 auto; table-layout: fixed; }
+
+    @media (max-width: 768px) {
+      .form-group .form-control,
+      .form-group .form-select,
+      .form-group textarea.form-control {
+        width: 100%;
+      }
+      .pane .btn { width: 100% !important; }
+      .btn-row { flex-wrap: wrap; }
+
+      .pane-left .table-responsive { max-width: 100%; }
+      .pane-left .table { width: 100% !important; }
+    }
+
+   
+    body.fade-out { opacity: 0; transition: opacity 0.5s ease-out; }
+    body.fade-in  { opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+  
+    .checklist-wrap { background: #f7fcf7; border: 1px solid #e3f0e3; border-radius: 8px; padding: 10px; margin-top: 8px; }
+
+    .checklist-sticky{
+      position: -webkit-sticky; position: sticky;
+      top: 0; z-index: 5;
+      background: #f7fcf7;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      box-shadow: 0 2px 0 rgba(60,118,61,0.06);
+    }
+
+    .checklist-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+    .progress { height: 10px; background: #e8f4e8; }
+    .progress-bar { background-color: #3c763d; }
+
+    .question-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .35rem 0; border-bottom: 1px dashed #edf3ed; }
+    .question-row:last-child { border-bottom: 0; }
+    .question-text { font-size: 14px; line-height: 1.25rem; margin: 0; color: #2d5331; flex: 1 1 auto; }
+    .question-actions .btn { width: auto !important; min-width: 52px; padding: .2rem .5rem; font-size: 12px; }
+    .chip { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .5rem; border-radius: 999px; background: #eef8ee; color: #2d5331; font-size: 12px; }
+
+    .checklist-sections .section { border: 1px solid #e3f0e3; border-radius: 8px; margin-bottom: 8px; background: #fff; }
+    .checklist-sections .section-title { padding: .5rem .75rem; font-weight: 600; color: #2d5331; background: #eef8ee; border-bottom: 1px dashed #edf3ed; }
+    .checklist-sections .section-body { padding: .5rem .75rem; }
+
+ 
+    .btn-check {
+      position: static !important;
+      width: 1px; height: 1px; margin: 0; padding: 0; border: 0;
+      clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+    }
+
+   
+    .daily-grid-wrap{
+      margin-top: 12px;
+      background: #f7fcf7;
+      border: 1px solid #e3f0e3;
+      border-radius: 10px;
+      padding: 10px;
+
+     
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .daily-grid{
+      display: grid;
+      grid-template-columns: repeat(10, var(--cell-size)); 
+      gap: 8px;
+      align-items: start;
+
+
+      min-width: calc(var(--cell-size) * 10 + 9 * 8px);
+    }
+
+
+    .dg-hcell{
+      position: sticky; top: 0; z-index: 3;
+      background: #eef8ee;
+      border: 1px dashed #d7ead7;
+      border-radius: 8px;
+      text-align: center;
+      padding: 6px 2px;
+      font-weight: 700;
+      color: #2d5331;
+      line-height: 1.05rem;
+      font-size: 14px;
+    }
+
+ 
+    .dg-gradebar{
+      grid-column: 1 / -1;
+      margin-top: 6px;
+      margin-bottom: -2px;
+      font-weight: 700;
+      color: #2d5331;
+      font-size: 14px;
+    }
+
+
+    .dg-cell{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #fff;
+      border: 2px solid #2a4860;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #2d5331;
+      position: relative;
+      user-select: none;
+      outline: none;
+      transition: background .15s ease, border-color .15s ease, transform .05s ease;
+      font-size: 14px;
+    }
+    .dg-cell .dg-code{ pointer-events: none; }
+    .dg-cell::after{
+      content: "×";
+      position: absolute;
+      top: 6px; right: 8px;
+      font-weight: 700;
+      opacity: .45;
+    }
+
+ 
+    .dg-cell.state-yes{ background: #e9f7ee; border-color: #2ea043; color: #1f5d2a; }
+    .dg-cell.state-yes::after{ content: "✓"; color: #2ea043; opacity: 1; }
+
+   
+    .dg-cell.state-partial{ background: #fdeaea; border-color: #d73a49; color: #6b2024; }
+    .dg-cell.state-partial::after{ content: "✓"; color: #d73a49; opacity: 1; }
+
+    .dg-cell:focus-visible{ box-shadow: 0 0 0 3px rgba(60,118,61,.35); }
+    .dg-cell:hover{ transform: translateY(-1px); }
+
+
+    @media (max-width: 992px) {
+      :root{ --cell-size: 88px; }
+    }
+    @media (max-width: 768px) {
+      :root{ --cell-size: 80px; }
+      .dg-hcell, .dg-cell, .dg-gradebar { font-size: 13px; }
+    }
+    @media (max-width: 420px) {
+      :root{ --cell-size: 68px; }
+      .dg-hcell, .dg-cell, .dg-gradebar { font-size: 12px; }
+      .chip { font-size: 11px; }
+      .question-text { font-size: 13px; }
+    }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+/* Make the grid boxes smaller */
+.daily-grid { --cell-size: 50px; } /* was 96px */
+
+/* text inside each class box */
+.daily-grid .dg-cell { font-size: 10px; }
+
+/* “First / Last” headers */
+.daily-grid .dg-hcell,
+.daily-grid .dg-gradebar { font-size: 10px; padding: 5px 2px; }
+
+
+/* Keep things proportionate on small screens */
+@media (max-width: 768px) {
+  .daily-grid { --cell-size: 76px; }
+  .daily-grid .dg-hcell,
+  .daily-grid .dg-cell,
+  .daily-grid .dg-gradebar { font-size: 12px; }
+}
+
+@media (max-width: 420px) {
+  .daily-grid { --cell-size: 64px; }
+  .daily-grid .dg-hcell,
+  .daily-grid .dg-cell,
+  .daily
+	
+	
+	
+	
+	
+	
+	
+	
+	
+  </style>
+</head>
+
+<body>
+  <div class="split-card">
+    <!-- LEFT: Classroom Status Reporting + Submissions -->
+    <div class="pane pane-left">
+      <h5>Classroom Physical Status (CPS)</h5>
+
+      <div class="form-group">
+        <label for="dateLeft">Date:</label>
+        <input type="date" class="form-control" id="dateLeft">
+      </div>
+
+      <div class="form-group">
+        <label for="classes">Classes:</label>
+        <select id="classes" class="form-select" onchange="loadStudents()">
+          <option value="" disabled selected>Select Class</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="nid" >NID:</label>
+        <input type="text" class="form-control" id="nid" readonly >
+      </div>
+
+      <div class="form-group">
+        <label for="staffName" >Staff Name:</label>
+        <input type="text" class="form-control" id="staffName" readonly >
+      </div>
+
+      <div class="form-group">
+        <label for="session">Select Session:</label>
+        <select id="session" name="session" class="form-select" required>
+          <option value="" disabled selected>Select Session</option>
+          <option>Morning Session</option>
+          <option>Afternoon Session</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="period">Observed Period:</label>
+        <select id="period" name="period" class="form-select" required>
+          <option value="" disabled selected>Select Observation Period</option>
+          <option>First Period</option>
+          <option>Last Period</option>
+        </select>
+      </div>
+
+ 
+      <div id="observedChecklist" class="checklist-wrap" aria-labelledby="observedChecklistLabel">
+        <div class="checklist-sticky">
+          <div class="checklist-header">
+            <strong id="observedChecklistLabel" style="color:#2d5331;">Categories</strong>
+            <div class="chip"><span id="answeredCount">0</span>/<span id="totalCount">0</span> filled</div>
+          </div>
+          <div class="w-100">
+            <div class="progress">
+              <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+          </div>
+        </div>
+        <div id="checklistAccordion" class="checklist-sections"></div>
+        <input type="hidden" id="checklistJson" name="checklistJson" />
+      </div>
+
+      <div class="form-group mt-2">
+        <label for="actionTaken">Action Taken:</label>
+        <textarea class="form-control" id="actionTaken" rows="3" required disabled placeholder="Disabled (no issues reported)"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button id="submitBtn" class="btn btn-primary" onclick="submitBehavior(event)">Submit</button>
+        <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
+        <button type="button" class="btn btn-danger" onclick="navigateWithFade('teachers_landing_page.html')">Back</button>
+      </div>
+
+      <div class="mt-4">
+        <input type="hidden" id="editingRecordId">
+        <h5>Your Submissions</h5>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover text-center align-middle table-sm" id="recordsTable">
+            <thead class="table-success">
+              <tr>
+                <th style="display:none;">Record ID</th>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Period</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Daily Reports -->
+    <div class="pane pane-right">
+      <h4>CPS Daily Reports</h4>
+
+      <div class="inline-fields">
+        <div class="form-group">
+          <label for="reportDate" style="font-size: 12px;">Date:</label>
+          <input type="date" class="form-control" id="reportDate" name="reportDate" style="font-size: 12px; padding: 4px 8px; height: 32px;">
+        </div>
+
+        <div class="form-group">
+          <label for="grade" style="font-size: 12px;">Grade:</label>
+          <select id="grade" name="grade" class="form-select" required style="font-size: 12px; padding: 4px 8px; height: 32px;">
+            <option value="" disabled selected >Select Grade</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="session2" style="font-size: 12px;">Select Session:</label>
+          <select id="session2" name="session2" class="form-select" required style="font-size: 12px; padding: 4px 8px; height: 32px;">
+            <option value="" disabled selected >Select Session</option>
+            <option>Morning Session</option>
+            <option>Afternoon Session</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Dynamic grid lives here -->
+      <div id="dailyGridWrap" class="daily-grid-wrap">
+        <div class="text-muted" id="dailyGridPlaceholder">Select a Session to see classes grid…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+
+  <script>
+   
+    function todayYMD(){
+      const d = new Date();
+      const m = String(d.getMonth()+1).padStart(2,'0');
+      const day = String(d.getDate()).padStart(2,'0');
+      return d.getFullYear() + '-' + m + '-' + day;
+    }
+    function normPeriod(p){
+      p = (p || '').toLowerCase();
+      if (p.includes('first')) return 'first';
+      if (p.includes('last'))  return 'last';
+      return '';
+    }
+
+  
+    (function () {
+      const sessionSelect = document.getElementById('session2');
+      const gradeSelect   = document.getElementById('grade');
+
+      const MORNING   = ['Grade 1', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10'];
+      const AFTERNOON = ['Grade 2', 'Grade 3', 'Grade 4', 'Grade 5'];
+
+      function renderGrades(list) {
+        const current = gradeSelect.value;
+        gradeSelect.innerHTML = '<option value="" disabled selected>Select Grade</option>';
+        list.forEach(v => {
+          const opt = document.createElement('option');
+          opt.value = v;
+          opt.textContent = v;
+          gradeSelect.appendChild(opt);
+        });
+        if (list.includes(current)) gradeSelect.value = current;
+      }
+
+      function updateGradesForSession() {
+        const value = (sessionSelect.value || '').trim().toLowerCase();
+        const list =
+          value === 'morning session'   ? MORNING :
+          value === 'afternoon session' ? AFTERNOON : [];
+        renderGrades(list);
+        renderDailyGrid();        // build the grid
+        refreshGridStatus();      // paint tick n colors
+      }
+
+      sessionSelect.addEventListener('input',  updateGradesForSession);
+      sessionSelect.addEventListener('change', updateGradesForSession);
+      document.addEventListener('DOMContentLoaded', updateGradesForSession);
+    })();
+
+   
+    (function () {
+      const classSelect   = document.getElementById('classes');
+      const sessionSelect = document.getElementById('session');
+
+      const LETTERS = 'ABCDEFGHIJ'.split('');
+      const SESSION_GRADES_MAP = {
+        'morning session':   [1, 6, 7, 8, 9, 10],
+        'afternoon session': [2, 3, 4, 5]
+      };
+
+      function codesForGrade(g) {
+        if (g === 9 || g === 10) {
+          const s = Array.from({ length: 5 }, (_, i) => `${g}S${i + 1}`); 
+          const b = Array.from({ length: 5 }, (_, i) => `${g}B${i + 1}`); 
+          return [...s, ...b];
+        }
+        return LETTERS.map(l => `${g}${l}`); 
+      }
+
+      function renderOptions(codes) {
+        const prev = classSelect.value;
+        classSelect.innerHTML = '<option value="" disabled selected>Select Class</option>';
+        codes.forEach(code => {
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.textContent = code;
+          classSelect.appendChild(opt);
+        });
+        if (codes.includes(prev)) classSelect.value = prev;
+      }
+
+      function computeAndRender() {
+        const sVal = (sessionSelect.value || '').trim().toLowerCase();
+        const grades = SESSION_GRADES_MAP[sVal] || [1,2,3,4,5,6,7,8,9,10]; 
+        const codes  = grades.flatMap(codesForGrade);
+        renderOptions([...new Set(codes)]);
+      }
+
+      document.addEventListener('DOMContentLoaded', computeAndRender);
+      sessionSelect.addEventListener('input',  computeAndRender);
+      sessionSelect.addEventListener('change', computeAndRender);
+    })();
+
+ 
+    const GRID_SESSION_GRADES = {
+      morning:   [1, 6, 7, 8, 9, 10],
+      afternoon: [2, 3, 4, 5]
+    };
+    const GRID_LETTERS = "ABCDEFGHIJ".split("");
+
+    function renderDailyGrid(){
+      const wrap = document.getElementById('dailyGridWrap');
+      const raw = (document.getElementById('session2').value || '').trim().toLowerCase();
+
+      let grades = [];
+      if (raw === 'morning session') grades = GRID_SESSION_GRADES.morning;
+      else if (raw === 'afternoon session') grades = GRID_SESSION_GRADES.afternoon;
+
+      if (!grades.length){
+        wrap.innerHTML = '<div class="text-muted" id="dailyGridPlaceholder">Select a Session to see classes grid…</div>';
+        return;
+      }
+
+      let html = '<div class="daily-grid">';
+
+   
+      for (let c = 0; c < 10; c++){
+        html += `<div class="dg-hcell">${c % 2 === 0 ? 'First Period' : 'Last Period'}</div>`;
+      }
+
+      
+      grades.forEach(g => {
+        html += `<div class="dg-gradebar">Grade ${g}</div>`;
+
+        if (g === 9 || g === 10){
+         
+          for (let row = 0; row < 2; row++){
+            for (let c = 0; c < 10; c++){
+              const sec = Math.floor(c / 2) + 1;  
+              const stream = row === 0 ? 'S' : 'B';
+              const code = `${g}${stream}${sec}`;
+              const per  = (c % 2 === 0) ? 'first' : 'last';
+              html += cellHTML(code, per);
+            }
+          }
+        } else {
+         
+          for (let row = 0; row < 2; row++){
+            for (let c = 0; c < 10; c++){
+              const letterIndex = Math.floor(c / 2) + (row === 0 ? 0 : 5); 
+              const code = `${g}${GRID_LETTERS[letterIndex]}`;
+              const per  = (c % 2 === 0) ? 'first' : 'last';
+              html += cellHTML(code, per);
+            }
+          }
+        }
+      });
+
+      html += '</div>';
+      wrap.innerHTML = html;
+
+      function cellHTML(code, per){
+        return `<button type="button" class="dg-cell" data-code="${code}" data-per="${per}" aria-label="${code} ${per}">
+                  <span class="dg-code">${code}</span>
+                </button>`;
+      }
+    }
+
+    // Update status styling for classn n period
+    // status: 'yes' 
+    function markClassStatus(code, status, period){
+      let sel = `.dg-cell[data-code="${code}"]`;
+      if (period) sel += `[data-per="${period}"]`;
+      document.querySelectorAll(sel).forEach(el => {
+        el.classList.remove('state-yes','state-no','state-partial');
+        if (status === 'yes')         el.classList.add('state-yes');
+        else if (status === 'partial')el.classList.add('state-partial');
+      });
+    }
+
+    
+    const CHECKLIST_SPEC = [
+      { id: 'furniture', title: 'Furniture & Classroom Items', questions: [
+        'All desks and chairs are placed properly.',
+        'No new drawings, graffiti, scratches, or marks on desks/chairs/drawers',
+        'Class cupboards/shelves are organized.',
+        'All class property (charts, models, etc.) are returned to their places.'
+      ]},
+      { id: 'floor', title: 'Floor & Walls', questions: [
+        'Floor is free of paper, pencil shavings, or any litter.',
+        'No paint, pencil, or marker stains on floor or walls.',
+        'Waste is properly disposed of in the dustbin.'
+      ]},
+      { id: 'art', title: 'Art Materials', questions: [
+        'Paints, brushes, crayons, and other supplies are cleaned and well organized',
+        'Students have collected all their personal items.',
+        'Tables are wiped clean (if used for painting).'
+      ]},
+      { id: 'board', title: 'Board & Teaching Aids', questions: [
+        'Whiteboard is cleaned.',
+        'Markers and dusters are kept properly.',
+        'Visual aids or project materials are safely stored.'
+      ]},
+      { id: 'general', title: 'General', questions: [
+        'Windows and doors are closed before leaving.',
+        'Lights and fans are switched off.',
+        'Classroom looks neat and ready for the next session.'
+      ]}
+    ];
+
+    const totalQuestions = CHECKLIST_SPEC.reduce((sum, s) => sum + s.questions.length, 0);
+
+    function slugify(text){
+      return text.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    }
+
+    function buildChecklist(){
+      const acc = document.getElementById('checklistAccordion');
+      const totalCountEl = document.getElementById('totalCount');
+      totalCountEl.textContent = String(totalQuestions);
+
+      acc.innerHTML = '';
+
+      CHECKLIST_SPEC.forEach(section => {
+        const item = document.createElement('section');
+        item.className = 'section';
+        item.innerHTML = `
+          <div class="section-title">${section.title}</div>
+          <div class="section-body">
+            <div class="question-list" id="ql-${section.id}"></div>
+          </div>
+        `;
+        acc.appendChild(item);
+
+        const qWrap = item.querySelector(`#ql-${section.id}`);
+        section.questions.forEach((qText) => {
+          const qKey = `${section.id}__${slugify(qText)}`;
+          const name = `yn-${qKey}`;
+          const yesId = `${name}-yes`;
+          const noId  = `${name}-no`;
+
+          const row = document.createElement('div');
+          row.className = 'question-row';
+          row.innerHTML = `
+            <p class="question-text">${qText}</p>
+            <div class="question-actions">
+              <input type="radio" class="btn-check" tabindex="-1" name="${name}" id="${yesId}" value="Yes" />
+              <label class="btn btn-outline-success btn-sm" for="${yesId}" role="button" title="Mark Yes (Y)">Yes</label>
+
+              <input type="radio" class="btn-check" tabindex="-1" name="${name}" id="${noId}" value="No" />
+              <label class="btn btn-outline-danger btn-sm" for="${noId}" role="button" title="Mark No (N)">No</label>
+            </div>
+          `;
+          qWrap.appendChild(row);
+        });
+      });
+
+      wireChecklistHandlers();
+      updateProgress();
+    }
+
+    function allQuestionRadioInputs(){
+      return Array.from(document.querySelectorAll('#checklistAccordion input[type="radio"]'));
+    }
+
+    function updateActionTakenState(checklistObj){
+      const obj = checklistObj || collectChecklist();
+      const hasNo = Object.values(obj).includes('No');
+      const ta = document.getElementById('actionTaken');
+
+      if (hasNo) { ta.disabled = false; ta.placeholder = 'Describe the action taken...'; }
+      else { ta.disabled = true; ta.value = ''; ta.placeholder = 'Disabled (no issues reported)'; }
+    }
+
+    function updateProgress(){
+      const groups = new Set(allQuestionRadioInputs().map(i => i.name));
+      let answered = 0;
+      groups.forEach(name => {
+        if (document.querySelector(`input[name="${name}"]:checked`)) answered++;
+      });
+
+      const pct = Math.round((answered / totalQuestions) * 100);
+      document.getElementById('answeredCount').textContent = String(answered);
+      const bar = document.getElementById('progressBar');
+      bar.style.width = pct + '%';
+      bar.setAttribute('aria-valuenow', String(pct));
+      bar.textContent = pct ? pct + '%' : '';
+
+      const checklistObj = collectChecklist();
+      document.getElementById('checklistJson').value = JSON.stringify(checklistObj);
+      updateActionTakenState(checklistObj);
+    }
+
+    function collectChecklist(){
+      const result = {};
+      const groups = new Set(allQuestionRadioInputs().map(i => i.name));
+      groups.forEach(name => {
+        const checked = document.querySelector(`input[name="${name}"]:checked`);
+        const key = name.replace(/^yn-/, '');
+        result[key] = checked ? checked.value : null;
+      });
+      return result;
+    }
+
+    function wireChecklistHandlers(){
+      allQuestionRadioInputs().forEach(inp => { inp.addEventListener('change', updateProgress); });
+
+      // Keyboard shortcuts: Y/N set focused row work kurey tho balan
+      document.getElementById('observedChecklist').addEventListener('keydown', (e) => {
+        if (!['y','Y','n','N'].includes(e.key)) return;
+        const targetRow = e.target.closest('.question-row') || document.activeElement.closest?.('.question-row');
+        if (!targetRow) return;
+        const yes = targetRow.querySelector('input[value="Yes"]');
+        const no  = targetRow.querySelector('input[value="No"]');
+        if ((e.key === 'y' || e.key === 'Y') && yes){ yes.checked = true; yes.dispatchEvent(new Event('change', {bubbles:true})); }
+        if ((e.key === 'n' || e.key === 'N') && no){  no.checked  = true; no.dispatchEvent(new Event('change', {bubbles:true})); }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', buildChecklist);
+
+    
+    function clearForm(){
+      document.getElementById('dateLeft').value = todayYMD();
+      document.getElementById('classes').value = '';
+      document.getElementById('session').value = '';
+      document.getElementById('period').value = '';
+      document.getElementById('actionTaken').value = '';
+      document.querySelectorAll('#checklistAccordion input[type="radio"]').forEach(r => r.checked = false);
+      updateProgress();
+      // Keep NID and Staff Name
+    }
+
+    function navigateWithFade(url){
+      document.body.classList.add('fade-out');
+      setTimeout(() => { window.location.href = url; }, 300);
+    }
+
+    function loadStudents(){  }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+(function () {
+  const gradeSelect   = document.getElementById('grade');
+  const sessionSelect = document.getElementById('session2');
+  const gridWrap      = document.getElementById('dailyGridWrap');
+
+  if (!gradeSelect || !gridWrap) return;
+
+  function normalizeGrade(val) {
+    if (!val) return null;
+  
+    const num = String(val).match(/\d+/);
+    return num ? num[0] : String(val).trim().toLowerCase();
+  }
+
+  function findGradeEl(gradeValue) {
+    if (!gradeValue) return null;
+    const norm = normalizeGrade(gradeValue);
+    if (!norm) return null;
+
+  
+    let el = gridWrap.querySelector(`.dg-gradebar#grade-${norm}, .dg-gradebar[data-grade="${norm}"]`);
+    if (el) return el;
+
+
+    const bars = gridWrap.querySelectorAll('.dg-gradebar');
+    for (const bar of bars) {
+      const txt = (bar.textContent || '').toLowerCase();
+      if (/\d+/.test(norm)) {
+        if (txt.includes('grade ' + norm) || txt.trim() === norm) return bar;
+      } else {
+       
+        if (txt.includes(norm)) return bar;
+      }
+    }
+    return null;
+  }
+
+  function highlight(el) {
+   
+    try {
+      el.animate(
+        [
+          { boxShadow: '0 0 0 0 rgba(46,164,79,0)' },
+          { boxShadow: '0 0 0 8px rgba(46,164,79,.35)' },
+          { boxShadow: '0 0 0 0 rgba(46,164,79,0)' }
+        ],
+        { duration: 800, easing: 'ease-out' }
+      );
+    } catch (_) {}
+  }
+
+  function focusGridOnGrade(gradeValue) {
+    const target = findGradeEl(gradeValue);
+    if (target) {
+      
+      target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      highlight(target);
+      return true;
+    }
+    return false;
+  }
+
+  // When grade changes, focus the grid
+  gradeSelect.addEventListener('change', function () {
+    // If grid not yet rendered, wait for it
+    if (focusGridOnGrade(this.value)) return;
+
+    const mo = new MutationObserver(() => {
+      if (focusGridOnGrade(gradeSelect.value)) mo.disconnect();
+    });
+    mo.observe(gridWrap, { childList: true, subtree: true });
+  });
+
+ 
+  if (sessionSelect) {
+    sessionSelect.addEventListener('change', function () {
+      const currentGrade = gradeSelect.value;
+      if (!currentGrade) return;
+
+      // Observe once to catch the grid re-render
+      const mo = new MutationObserver(() => {
+        if (focusGridOnGrade(currentGrade)) mo.disconnect();
+      });
+      mo.observe(gridWrap, { childList: true, subtree: true });
+
+      
+      setTimeout(() => focusGridOnGrade(currentGrade), 0);
+    });
+  }
+
+  // Optional: if grade is preselected on load, try focusing once DOM is ready
+  if (gradeSelect.value) {
+    window.addEventListener('load', () => setTimeout(() => focusGridOnGrade(gradeSelect.value), 0));
+  }
+})();
+
+	
+	
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Set both dates to today on load
+      const today = todayYMD();
+      const dateLeft   = document.getElementById('dateLeft');
+      const reportDate = document.getElementById('reportDate');
+      if (dateLeft && !dateLeft.value)   dateLeft.value   = today;
+      if (reportDate && !reportDate.value) reportDate.value = today;
+
+      // Retrieve phone number saved from login login id kamah
+      const phoneNumber = localStorage.getItem('phoneNumber');
+      if (phoneNumber) {
+        const nidField = document.getElementById('nid');
+        if (nidField) nidField.value = phoneNumber.trim();
+      }
+
+     
+      setTimeout(refreshGridStatus, 100);
+
+      // Load my submissions for today's date
+      if (typeof loadMySubmissions === 'function') loadMySubmissions();
+    });
+
+    function recallUserName() {
+      const nid = localStorage.getItem('phoneNumber');
+      if (!nid) {
+        console.warn('No NID found to recall staff name.');
+        return;
+      }
+
+      fetch(`https://script.google.com/macros/s/AKfycbxcif2M0iA6aZS3MB-XUNRg6ifXKFFCNhwly3llzuI-005QEv0BN3mfibBK4uTDvOu8/exec?action=getUserDetails&nid=${nid}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('staffName').value = data.name;
+          } else {
+            console.error('Failed to get staff name:', data.message);
+          }
+        })
+        .catch(error => console.error('Error recalling user name:', error));
+    }
+    recallUserName();
+    function recallUserName() {
+      const nid = localStorage.getItem('phoneNumber');
+      if (!nid) {
+        console.warn('No NID found to recall staff name.');
+        return;
+      }
+
+      fetch(`https://script.google.com/macros/s/AKfycbxcif2M0iA6aZS3MB-XUNRg6ifXKFFCNhwly3llzuI-005QEv0BN3mfibBK4uTDvOu8/exec?action=getUserDetails&nid=${nid}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('staffName').value = data.name;
+          } else {
+            console.error('Failed to get staff name:', data.message);
+          }
+        })
+        .catch(error => console.error('Error recalling user name:', error));
+    }
+
+ 
+    const cpsScriptUrl = 'https://script.google.com/macros/s/AKfycbyMN2rWs1w2BsQU_sAYO2V6OoHAJD5m40PclCf-xN0F3datjop7rZ12OcVrSz63tKkuHA/exec';
+
+    // Helpers
+    function getChecklistState(){
+      const obj = collectChecklist();
+      const values = Object.values(obj);
+      const unansweredCount = values.filter(v => v === null).length;
+      const hasNo = values.includes('No');
+      return { obj, unansweredCount, hasNo };
+    }
+
+    // Validate all required bits before submit
+    function validateCPS(){
+      const nid        = (document.getElementById('nid').value || '').trim();
+      const staffName  = (document.getElementById('staffName').value || '').trim();
+      const dateLeft   = (document.getElementById('dateLeft').value || '').trim();
+      const cls        = (document.getElementById('classes').value || '').trim();
+      const period     = (document.getElementById('period').value || '').trim();
+      const actionTaken= (document.getElementById('actionTaken').value || '').trim();
+
+      const { obj, unansweredCount, hasNo } = getChecklistState();
+
+      if (!nid || !staffName || !dateLeft || !cls || !period){
+        return { ok:false, msg:'Please fill NID, Staff Name, Date, Class and Observed Period.' };
+      }
+      if (unansweredCount > 0){
+        return { ok:false, msg:`Please answer all checklist items (${unansweredCount} remaining).` };
+      }
+      if (hasNo && !actionTaken){
+        return { ok:false, msg:'Action Taken is required when any item is marked No.' };
+      }
+      return { ok:true, checklistObj: obj };
+    }
+
+  
+    async function checkDuplicate(dateStr, classCode, periodLabel){
+      const url = `${cpsScriptUrl}?action=checkCPSDuplicate`
+                + `&date=${encodeURIComponent(dateStr)}`
+                + `&className=${encodeURIComponent(classCode)}`
+                + `&period=${encodeURIComponent(periodLabel)}`;
+      try{
+        const res = await fetch(url);
+        return await res.json();
+      } catch(e){
+        return null; // let server hard-block handle if preflight fails mi delete if its working
+      }
+    }
+
+    // Submit handler with duplicate prevention
+    window.submitBehavior = async function(e){
+      if (e && e.preventDefault) e.preventDefault();
+      updateProgress(); // ensure hidden JSON is pls fresh delete after testing
+
+      const check = validateCPS();
+      if (!check.ok){
+        alert(check.msg);
+        return;
+      }
+
+      const dateStr   = document.getElementById('dateLeft').value.trim();
+      const classCode = document.getElementById('classes').value.trim();
+      const periodLbl = document.getElementById('period').value.trim(); // "First Period" / "Last Period"
+
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Submitting…';
+
+      try{
+        // 1) Preflight duplicate check
+        const pre = await checkDuplicate(dateStr, classCode, periodLbl);
+        if (pre && pre.success && pre.exists){
+          const by = pre.existing?.staffName ? ` by ${pre.existing.staffName}` : '';
+          alert(`A submission for ${classCode} — ${periodLbl} on ${dateStr} already exists${by}.`);
+          return;
+        }
+
+        // 2) Proceed to submit (server also blocks duplicates)
+        const params = new URLSearchParams({
+          action: 'submitCPS',
+          nid:         document.getElementById('nid').value.trim(),
+          staffName:   document.getElementById('staffName').value.trim(),
+          date:        dateStr,
+          className:   classCode,
+          period:      periodLbl,
+          actionTaken: document.getElementById('actionTaken').value.trim(),
+          checklistJson: document.getElementById('checklistJson').value
+        });
+
+        const resp = await fetch(cpsScriptUrl, {
+          method: 'POST',
+          headers: { 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: params.toString()
+        });
+
+        const data = await resp.json().catch(() => ({}));
+
+        // If server blocked as duplicate, show a clear message
+        if (data && data.success === false && data.error === 'duplicate'){
+          const by = data.existing?.staffName ? ` by ${data.existing.staffName}` : '';
+          alert(`A submission for ${classCode} — ${periodLbl} on ${dateStr} already exists${by}.`);
+          return;
+        }
+
+        if (data && data.success){
+          alert('✅ Submitted successfully!');
+          clearForm();
+          refreshGridStatus();
+          loadMySubmissions(); // NEW: refresh my list
+        } else {
+          throw new Error((data && data.error) || 'Unknown error');
+        }
+      } catch (err){
+        console.error(err);
+        alert('❌ Submission failed: ' + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    };
+
+    
+    async function refreshGridStatus(){
+      const dateStr = (document.getElementById('reportDate').value || todayYMD()).trim();
+
+      try{
+        const url = `${cpsScriptUrl}?action=getCPSStatus&date=${encodeURIComponent(dateStr)}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data || !data.success) {
+          console.warn('Status fetch failed:', data && data.error);
+          return;
+        }
+
+        // Reset all visible cells to default (×)
+        document.querySelectorAll('.dg-cell[data-code]').forEach(el => {
+          el.classList.remove('state-yes','state-no','state-partial');
+        });
+
+        // Preferred: statusesByPeriod
+        if (data.statusesByPeriod && typeof data.statusesByPeriod === 'object') {
+          Object.keys(data.statusesByPeriod).forEach(code => {
+            const perObj = data.statusesByPeriod[code] || {};
+            ['first','last'].forEach(p => {
+              const row = perObj[p] || perObj[(p === 'first' ? 'First Period' : 'Last Period')] || null;
+              if (!row || !row.hasRecord) return;
+              markClassStatus(code, row.allYes ? 'yes' : 'partial', p);
+            });
+          });
+          return;
+        }
+
+        // Alternative: records array
+        if (Array.isArray(data.records)) {
+          data.records.forEach(rec => {
+            const code   = (rec.className || rec.class || '').trim();
+            const period = normPeriod(rec.period);
+            if (!code || !period) return;
+            markClassStatus(code, rec.allYes ? 'yes' : 'partial', period);
+          });
+          return;
+        }
+
+        
+        if (data.statuses && typeof data.statuses === 'object') {
+          Object.keys(data.statuses).forEach(code => {
+            const { hasRecord, allYes } = data.statuses[code] || {};
+            if (!hasRecord) return;
+            markClassStatus(code, allYes ? 'yes' : 'partial', 'first');
+            markClassStatus(code, allYes ? 'yes' : 'partial', 'last');
+          });
+        }
+      } catch (err){
+        console.error('Error fetching CPS status:', err);
+      }
+    }
+
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const reportDate = document.getElementById('reportDate');
+      reportDate.addEventListener('change', () => {
+        renderDailyGrid();
+        refreshGridStatus();
+      });
+
+     
+      const dateLeft = document.getElementById('dateLeft');
+      dateLeft.addEventListener('change', () => loadMySubmissions());
+    });
+
+    
+    let detailsModal;
+    document.addEventListener('DOMContentLoaded', () => {
+      const modalEl = document.getElementById('detailsModal');
+      detailsModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: true });
+
+    
+      modalEl.addEventListener('hide.bs.modal', () => {
+        if (modalEl.contains(document.activeElement)) {
+          document.activeElement.blur();
+        }
+      });
+    });
+
+
+    document.addEventListener('click', async (evt) => {
+      const cell = evt.target.closest('.dg-cell');
+      if (!cell || !cell.classList.contains('state-partial')) return; 
+
+      const code    = cell.dataset.code;
+      const period  = cell.dataset.per;               
+      const dateStr = (document.getElementById('reportDate').value || todayYMD()).trim();
+
+      try {
+        const url = `${cpsScriptUrl}?action=getCPSDetails`
+                  + `&date=${encodeURIComponent(dateStr)}`
+                  + `&className=${encodeURIComponent(code)}`
+                  + `&period=${encodeURIComponent(period)}`;
+
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        const title = `${code} — ${period === 'first' ? 'First Period' : 'Last Period'} (${dateStr})`;
+        document.getElementById('detailsModalTitle').textContent = title;
+
+        const body = document.getElementById('detailsModalBody');
+        body.innerHTML = '';
+
+        const esc = (s) => String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+        if (!data || !data.success) {
+          body.innerHTML = `<div class="text-danger">Failed to load details.</div>`;
+        } else {
+          const rec = Array.isArray(data.records) ? data.records[0] : (data.record || null);
+
+          if (!rec) {
+            body.innerHTML = `<div class="text-muted">No issues found for this class/period.</div>`;
+          } else {
+            const submitted = document.createElement('div');
+            submitted.className = 'mb-1';
+            submitted.innerHTML = `<span class="fw-semibold">Submitted by:</span> ${esc(rec.staffName) || 'Unknown'}`;
+
+            const action = document.createElement('div');
+            action.className = 'mb-2';
+            action.innerHTML = `<span class="fw-semibold">Action taken:</span> ${esc(rec.actionTaken) || '<em>—</em>'}`;
+
+            const issueHdr = document.createElement('div');
+            issueHdr.className = 'fw-semibold mb-1';
+            issueHdr.textContent = 'Issue area:';
+
+            const list = document.createElement('ul');
+            list.className = 'mb-0';
+            (rec.noItems || []).forEach(txt => {
+              const li = document.createElement('li');
+              li.textContent = txt;
+              list.appendChild(li);
+            });
+
+            if (!rec.noItems || rec.noItems.length === 0) {
+              const li = document.createElement('li');
+              li.innerHTML = '<em>No specific issue areas listed.</em>';
+              list.appendChild(li);
+            }
+
+            body.appendChild(submitted);
+            body.appendChild(action);
+            body.appendChild(issueHdr);
+            body.appendChild(list);
+          }
+        }
+
+        const modalEl = document.getElementById('detailsModal');
+        if (!detailsModal) detailsModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: true });
+        requestAnimationFrame(() => detailsModal.show());
+      } catch (err) {
+        console.error(err);
+        document.getElementById('detailsModalTitle').textContent = `${code} — Details`;
+        document.getElementById('detailsModalBody').innerHTML =
+          `<div class="text-danger">Error loading details.</div>`;
+
+        const modalEl = document.getElementById('detailsModal');
+        if (!detailsModal) detailsModal = bootstrap.Modal.getOrCreateInstance(modalEl, { focus: true });
+        requestAnimationFrame(() => detailsModal.show());
+      }
+    });
+
+  
+    async function loadMySubmissions(){
+  const nid = (document.getElementById('nid').value || '').trim() || localStorage.getItem('phoneNumber') || '';
+  const dateStr = (document.getElementById('dateLeft').value || todayYMD()).trim();
+  const tbody = document.getElementById('recordsBody');
+  tbody.innerHTML = '<tr><td colspan="4" class="text-muted">Loading…</td></tr>';
+
+  if (!nid){
+    tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No NID found.</td></tr>';
+    return;
+  }
+
+  try{
+    const url = `${cpsScriptUrl}?action=getCPSByNID&nid=${encodeURIComponent(nid)}&date=${encodeURIComponent(dateStr)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if (!data || !data.success){
+      tbody.innerHTML = '<tr><td colspan="4" class="text-danger">Failed to load submissions.</td></tr>';
+      return;
+    }
+
+    const recs = Array.isArray(data.records) ? data.records : [];
+    if (recs.length === 0){
+      tbody.innerHTML = '<tr><td colspan="4" class="text-muted">No submissions for this date.</td></tr>';
+      return;
+    }
+
+ 
+    const rowsHtml = recs.map(r => {
+      const safeDate   = (r.date || '').toString();
+      const safeClass  = (r.className || '').toString();
+      const safePeriod = (r.period || '').toString();
+      const rowId      = r.row;
+      return `
+        <tr data-row="${rowId}">
+          <td style="display:none;">${rowId}</td>
+          <td>${safeDate}</td>
+          <td>${safeClass}</td>
+          <td>${safePeriod}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-danger btn-delete" data-row="${rowId}">Delete</button>
+          </td>
+        </tr>`;
+    }).join('');
+    tbody.innerHTML = rowsHtml;
+  } catch(err){
+    console.error(err);
+    tbody.innerHTML = '<tr><td colspan="4" class="text-danger">Error loading submissions.</td></tr>';
+  }
+}
+
+    
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.btn-delete');
+      if (!btn) return;
+
+      const row = btn.getAttribute('data-row');
+      const nid = (document.getElementById('nid').value || '').trim() || localStorage.getItem('phoneNumber') || '';
+
+      if (!row || !nid) return;
+      if (!confirm('Delete this submission? This cannot be undone.')) return;
+
+      try{
+        const url = `${cpsScriptUrl}?action=deleteCPSRow&row=${encodeURIComponent(row)}&nid=${encodeURIComponent(nid)}`;
+        const res = await fetch(url, { method:'POST' });
+        const data = await res.json();
+
+        if (data && data.success){
+          alert('Deleted.');
+          loadMySubmissions();
+          
+          refreshGridStatus();
+        } else {
+          alert('Delete failed: ' + ((data && data.error) || 'Unknown error'));
+        }
+      } catch(err){
+        console.error(err);
+        alert('Delete failed: ' + err.message);
+      }
+    });
+  </script>
+
+  <!-- Details Modal -->
+  <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalTitle">Class Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="detailsModalBody">
+          <!-- filled dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
