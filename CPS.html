@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,285 +8,391 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
   <style>
+:root{
+  --field-width: 235px;
+  --button-width: 70px;
+  --table-width: 520px;
+  --table-inner-width: 380px;
 
-    :root{
-     
-      --field-width: 235px;
-      --button-width: 70px;
-      --table-width: 520px;
-      --table-inner-width: 380px;
+  --cell-size: 96px;
+}
 
-     
-      --cell-size: 96px;
-    }
+body {
+  background-color: #dff0d8;
+  font-family: Arial, sans-serif;
+  font-size: 10px;
+  margin: 0;
+}
 
-    body {
-      background-color: #dff0d8;
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      margin: 0;
-    }
+h4, h5 {
+  text-align: center;
+  color: #3c763d;
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
 
-    h4, h5 {
-      text-align: center;
-      color: #3c763d;
-      margin-top: 4px;
-      margin-bottom: 16px;
-    }
+.form-group { margin-bottom: 12px; }
+.btn-primary { background-color: #3c763d; border: none; }
+.btn-primary:hover { background-color: #2e6b2f; }
+.developer-credit {
+  text-align: center; margin: 12px 0 24px;
+  font-size: 12px; color: #3c763d; font-style: italic; font-family: "Georgia", serif;
+}
 
-    .form-group { margin-bottom: 12px; }
-    .btn-primary { background-color: #3c763d; border: none; }
-    .btn-primary:hover { background-color: #2e6b2f; }
-    .developer-credit {
-      text-align: center; margin: 12px 0 24px;
-      font-size: 12px; color: #3c763d; font-style: italic; font-family: "Georgia", serif;
-    }
+.form-group .form-control,
+.form-group .form-select,
+.form-group textarea.form-control {
+  width: min(100%, var(--field-width));
+  display: inline-block;
+}
 
- 
-    .form-group .form-control,
-    .form-group .form-select,
-    .form-group textarea.form-control {
-      width: min(100%, var(--field-width));
-      display: inline-block;
-    }
+.pane .btn {
+  width: min(100%, var(--button-width)) !important;
+  display: block;
+  margin: 0 auto;
+  white-space: nowrap;
+}
 
-    .pane .btn {
-      width: min(100%, var(--button-width)) !important;
-      display: block;
-      margin: 0 auto;
-      white-space: nowrap;
-    }
+.btn-row{
+  display: flex;
+  gap: .5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-top: .5rem;
+}
+.btn-row .btn{ margin: 0 !important; display: inline-flex; align-items: center; justify-content: center; }
 
-    .btn-row{
-      display: flex;
-      gap: .5rem;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: nowrap;
-      margin-top: .5rem;
-    }
-    .btn-row .btn{ margin: 0 !important; display: inline-flex; align-items: center; justify-content: center; }
+.split-card {
+  width: min(100vw - 16px, 830px);
+  margin: 20px auto 0;
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
 
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: stretch;
+}
 
-    .split-card {
-      width: min(100vw - 16px, 1200px);
-      margin: 20px auto 0;
-      background-color: #fff;
-      padding: 16px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 8px;
-      align-items: stretch;
-    }
-
-    .pane {
-      min-width: 0;
-      background: #fff;
-      border-radius: 8px;
-      padding: 14px;
-      box-shadow: 0 0 0 rgba(0,0,0,0);
-      max-height: calc(100vh - 120px);
-      overflow: auto;
-    }
-
-    .split-card > .pane-left  { flex: 0 0 25%; max-width: 25%; }
-    .split-card > .pane-right { flex: 1 1 55%; max-width: 55%; }
+.pane {
+  min-width: 0;
+  background: #fff;
+  border-radius: 8px;
+  padding: 14px;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+}
 
 
-    @media (max-width: 992px) {
-      .split-card { gap: 12px; }
-      .split-card > .pane-left  { flex-basis: 25%; max-width: 25%; }
-      .split-card > .pane-right { flex-basis: 55%; max-width: 55%; }
-    }
-
-   
-    @media (max-width: 768px) {
-      .split-card { flex-direction: column; padding: 12px; }
-      .split-card > .pane-left,
-      .split-card > .pane-right { flex: 0 0 auto; max-width: 100%; }
-      .pane { max-height: none; }
-      h4, h5 { margin-bottom: 10px; }
-    }
-
-    .inline-fields {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-end;
-      flex-wrap: nowrap;
-      justify-content: center; 
-    }
-    .inline-fields .form-group { flex: 0 0 auto; margin: 0; }
-    .form-group label { display: block; margin-bottom: 0.35rem; }
-
-   
-    .pane-left .table-responsive { max-width: var(--table-width); margin: 0 auto; }
-    .pane-left .table { width: min(100%, var(--table-inner-width)) !important; margin: 0 auto; table-layout: fixed; }
-
-    @media (max-width: 768px) {
-      .form-group .form-control,
-      .form-group .form-select,
-      .form-group textarea.form-control {
-        width: 100%;
-      }
-      .pane .btn { width: 100% !important; }
-      .btn-row { flex-wrap: wrap; }
-
-      .pane-left .table-responsive { max-width: 100%; }
-      .pane-left .table { width: 100% !important; }
-    }
-
-   
-    body.fade-out { opacity: 0; transition: opacity 0.5s ease-out; }
-    body.fade-in  { opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
-    @keyframes fadeIn { to { opacity: 1; } }
-
-  
-    .checklist-wrap { background: #f7fcf7; border: 1px solid #e3f0e3; border-radius: 8px; padding: 10px; margin-top: 8px; }
-
-    .checklist-sticky{
-      position: -webkit-sticky; position: sticky;
-      top: 0; z-index: 5;
-      background: #f7fcf7;
-      padding-bottom: 8px;
-      margin-bottom: 8px;
-      box-shadow: 0 2px 0 rgba(60,118,61,0.06);
-    }
-
-    .checklist-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
-    .progress { height: 10px; background: #e8f4e8; }
-    .progress-bar { background-color: #3c763d; }
-
-    .question-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .35rem 0; border-bottom: 1px dashed #edf3ed; }
-    .question-row:last-child { border-bottom: 0; }
-    .question-text { font-size: 14px; line-height: 1.25rem; margin: 0; color: #2d5331; flex: 1 1 auto; }
-    .question-actions .btn { width: auto !important; min-width: 52px; padding: .2rem .5rem; font-size: 12px; }
-    .chip { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .5rem; border-radius: 999px; background: #eef8ee; color: #2d5331; font-size: 12px; }
-
-    .checklist-sections .section { border: 1px solid #e3f0e3; border-radius: 8px; margin-bottom: 8px; background: #fff; }
-    .checklist-sections .section-title { padding: .5rem .75rem; font-weight: 600; color: #2d5331; background: #eef8ee; border-bottom: 1px dashed #edf3ed; }
-    .checklist-sections .section-body { padding: .5rem .75rem; }
-
- 
-    .btn-check {
-      position: static !important;
-      width: 1px; height: 1px; margin: 0; padding: 0; border: 0;
-      clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap;
-    }
-
-   
-    .daily-grid-wrap{
-      margin-top: 12px;
-      background: #f7fcf7;
-      border: 1px solid #e3f0e3;
-      border-radius: 10px;
-      padding: 10px;
-
-     
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .daily-grid{
-      display: grid;
-      grid-template-columns: repeat(10, var(--cell-size)); 
-      gap: 8px;
-      align-items: start;
 
 
-      min-width: calc(var(--cell-size) * 10 + 9 * 8px);
-    }
 
 
-    .dg-hcell{
-      position: sticky; top: 0; z-index: 3;
-      background: #eef8ee;
-      border: 1px dashed #d7ead7;
-      border-radius: 8px;
-      text-align: center;
-      padding: 6px 2px;
-      font-weight: 700;
-      color: #2d5331;
-      line-height: 1.05rem;
-      font-size: 14px;
-    }
-
- 
-    .dg-gradebar{
-      grid-column: 1 / -1;
-      margin-top: 6px;
-      margin-bottom: -2px;
-      font-weight: 700;
-      color: #2d5331;
-      font-size: 14px;
-    }
 
 
-    .dg-cell{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #fff;
-      border: 2px solid #2a4860;
-      border-radius: 6px;
-      font-weight: 600;
-      color: #2d5331;
-      position: relative;
-      user-select: none;
-      outline: none;
-      transition: background .15s ease, border-color .15s ease, transform .05s ease;
-      font-size: 14px;
-    }
-    .dg-cell .dg-code{ pointer-events: none; }
-    .dg-cell::after{
-      content: "×";
-      position: absolute;
-      top: 6px; right: 8px;
-      font-weight: 700;
-      opacity: .45;
-    }
-
- 
-    .dg-cell.state-yes{ background: #e9f7ee; border-color: #2ea043; color: #1f5d2a; }
-    .dg-cell.state-yes::after{ content: "✓"; color: #2ea043; opacity: 1; }
-
-   
-    .dg-cell.state-partial{ background: #fdeaea; border-color: #d73a49; color: #6b2024; }
-    .dg-cell.state-partial::after{ content: "✓"; color: #d73a49; opacity: 1; }
-
-    .dg-cell:focus-visible{ box-shadow: 0 0 0 3px rgba(60,118,61,.35); }
-    .dg-cell:hover{ transform: translateY(-1px); }
 
 
-    @media (max-width: 992px) {
-      :root{ --cell-size: 88px; }
-    }
-    @media (max-width: 768px) {
-      :root{ --cell-size: 80px; }
-      .dg-hcell, .dg-cell, .dg-gradebar { font-size: 13px; }
-    }
-    @media (max-width: 420px) {
-      :root{ --cell-size: 68px; }
-      .dg-hcell, .dg-cell, .dg-gradebar { font-size: 12px; }
-      .chip { font-size: 11px; }
-      .question-text { font-size: 13px; }
-    }
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+/* Smaller buttons in the LEFT CPS pane */
+
+/* Narrower fixed width for Submit / Clear / Back */
+.pane-left { --button-width: 56px; } /* was 70px */
+
+/* Tighter sizing for those action buttons */
+.pane-left .btn-row .btn{
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  min-height: 1.5rem;
+  line-height: 1.1;
+}
+
+/* Smaller Yes / No toggle buttons in the checklist */
+.pane-left .question-actions .btn,
+.pane-left .btn-check + .btn{
+  font-size: 0.58rem;
+  padding: 0.18rem 0.45rem;
+  min-width: 30px;     /* was 52px */
+  min-height: 0.9rem;
+}
+
+/* Optional: slightly tighter spacing for the action row */
+.pane-left .btn-row{
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Compact fonts just in the LEFT "Classroom Physical Status (CPS)" pane */
+.pane-left h5{
+  font-size: 0.95rem;           /* slightly smaller section title */
+  margin-bottom: 0.6rem;
+}
+
+.pane-left .form-group label{
+  font-size: 0.85rem;           /* smaller labels */
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+/* Inputs & selects smaller (override Bootstrap's roomy defaults) */
+.pane-left .form-control:not(textarea),
+.pane-left .form-select{
+  font-size: 0.85rem;           /* smaller text inside controls */
+  padding: 0.25rem 0.5rem;      /* tighter padding */
+  line-height: 1.2;
+  min-height: 1.9rem;           /* reduce the default ~2.4rem height */
+}
+
+/* Textarea: keep readable height but smaller font/padding */
+.pane-left textarea.form-control{
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem;
+}
+
+/* Optional: smaller placeholder text too */
+.pane-left .form-control::placeholder{
+  font-size: 0.85rem;
+}
+
+/* (If you use checkboxes/radios with labels) */
+.pane-left .form-check-label{
+  font-size: 0.85rem;
+}
+
+
+
+
+
+/* Mifu this is for future use ingey. this is to keep the hidden grid cells slot so headers stay aligned */
+.dg-cell.is-hidden{
+  visibility: hidden;          /* keeps the column width */
+  pointer-events: none;
+  border: 0;
+  background: transparent;
+}
+.dg-cell.is-hidden::after{ content: ""; } /* remove the × */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* LEFT panel reduced only */
+.split-card > .pane-left  { flex: 0 0 32%; max-width: 32%; }
+/* RIGHT panel unchanged */
+.split-card > .pane-right { flex: 1 1 75%; max-width: 75%; }
+
+@media (max-width: 992px) {
+  .split-card { gap: 12px; }
+  /* LEFT panel reduced only (was 32%) */
+  .split-card > .pane-left  { flex-basis: 24%; max-width: 24%; }
+  /* RIGHT panel unchanged */
+  .split-card > .pane-right { flex-basis: 68%; max-width: 68%; }
+}
+
+@media (max-width: 768px) {
+  .split-card { flex-direction: column; padding: 12px; }
+  .split-card > .pane-left,
+  .split-card > .pane-right { flex: 0 0 auto; max-width: 100%; }
+  .pane { max-height: none; }
+  h4, h5 { margin-bottom: 10px; }
+}
+
+.inline-fields {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  justify-content: center; 
+}
+.inline-fields .form-group { flex: 0 0 auto; margin: 0; }
+.form-group label { display: block; margin-bottom: 0.35rem; }
+
+.pane-left .table-responsive { max-width: var(--table-width); margin: 0 auto; }
+.pane-left .table { width: min(100%, var(--table-inner-width)) !important; margin: 0 auto; table-layout: fixed; }
+
+@media (max-width: 768px) {
+  .form-group .form-control,
+  .form-group .form-select,
+  .form-group textarea.form-control {
+    width: 100%;
+  }
+  .pane .btn { width: 100% !important; }
+  .btn-row { flex-wrap: wrap; }
+
+  .pane-left .table-responsive { max-width: 100%; }
+  .pane-left .table { width: 100% !important; }
+}
+
+body.fade-out { opacity: 0; transition: opacity 0.5s ease-out; }
+body.fade-in  { opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
+
+.checklist-wrap { background: #f7fcf7; border: 1px solid #e3f0e3; border-radius: 8px; padding: 10px; margin-top: 8px; }
+
+.checklist-sticky{
+  position: -webkit-sticky; position: sticky;
+  top: 0; z-index: 5;
+  background: #f7fcf7;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 0 rgba(60,118,61,0.06);
+}
+
+.checklist-header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+.progress { height: 10px; background: #e8f4e8; }
+.progress-bar { background-color: #3c763d; }
+
+.question-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .35rem 0; border-bottom: 1px dashed #edf3ed; }
+.question-row:last-child { border-bottom: 0; }
+.question-text { font-size: 11px; line-height: 1.25rem; margin: 0; color: #2d5331; flex: 1 1 auto; }
+.question-actions .btn { width: auto !important; min-width: 52px; padding: .2rem .5rem; font-size: 12px; }
+.chip { display: inline-flex; align-items: center; gap: .35rem; padding: .15rem .5rem; border-radius: 999px; background: #eef8ee; color: #2d5331; font-size: 11px; }
+
+.checklist-sections .section { border: 1px solid #e3f0e3; border-radius: 8px; margin-bottom: 8px; background: #fff; }
+.checklist-sections .section-title { padding: .5rem .75rem; font-weight: 600; color: #2d5331; background: #eef8ee; border-bottom: 1px dashed #edf3ed; }
+.checklist-sections .section-body { padding: .5rem .75rem; }
+
+.btn-check {
+  position: static !important;
+  width: 1px; height: 1px; margin: 0; padding: 0; border: 0;
+  clip: rect(0 0 0 0); clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+
+.daily-grid-wrap{
+  margin-top: 12px;
+  background: #f7fcf7;
+  border: 1px solid #e3f0e3;
+  border-radius: 10px;
+  padding: 10px;
+
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.daily-grid{
+  display: grid;
+  grid-template-columns: repeat(10, var(--cell-size)); 
+  gap: 8px;
+  align-items: start;
+
+  min-width: calc(var(--cell-size) * 10 + 9 * 8px);
+}
+
+.dg-hcell{
+  position: sticky; top: 0; z-index: 3;
+  background: #eef8ee;
+  border: 1px dashed #d7ead7;
+  border-radius: 8px;
+  text-align: center;
+  padding: 6px 2px;
+  font-weight: 700;
+  color: #2d5331;
+  line-height: 1.05rem;
+  font-size: 12px;
+}
+
+.dg-gradebar{
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  margin-bottom: -2px;
+  font-weight: 700;
+  color: #2d5331;
+  font-size: 12px;
+}
+
+.dg-cell{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #fff;
+  border: 2px solid #2a4860;
+  border-radius: 6px;
+  font-weight: 600;
+  color: #2d5331;
+  position: relative;
+  user-select: none;
+  outline: none;
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+  font-size: 12px;
+}
+.dg-cell .dg-code{ pointer-events: none; }
+.dg-cell::after{
+  content: "×";
+  position: absolute;
+  top: 1px; right: 5px;
+  font-weight: 700;
+  opacity: .45;
+}
+
+.dg-cell.state-yes{ background: #e9f7ee; border-color: #2ea043; color: #1f5d2a; }
+.dg-cell.state-yes::after{ content: "✓"; color: #2ea043; opacity: 1; }
+
+.dg-cell.state-partial{ background: #fdeaea; border-color: #d73a49; color: #6b2024; }
+.dg-cell.state-partial::after{ content: "✓"; color: #d73a49; opacity: 1; }
+
+.dg-cell:focus-visible{ box-shadow: 0 0 0 3px rgba(60,118,61,.35); }
+.dg-cell:hover{ transform: translateY(-1px); }
+
+@media (max-width: 992px) {
+  :root{ --cell-size: 88px; }
+}
+@media (max-width: 768px) {
+  :root{ --cell-size: 80px; }
+  .dg-hcell, .dg-cell, .dg-gradebar { font-size: 13px; }
+}
+@media (max-width: 420px) {
+  :root{ --cell-size: 68px; }
+  .dg-hcell, .dg-cell, .dg-gradebar { font-size: 12px; }
+  .chip { font-size: 11px; }
+  .question-text { font-size: 13px; }
+}
 
 /* Make the grid boxes smaller */
-.daily-grid { --cell-size: 50px; } /* was 96px */
+.daily-grid { --cell-size: 40px; } /* was 96px */
 
 /* text inside each class box */
 .daily-grid .dg-cell { font-size: 10px; }
@@ -295,7 +400,6 @@
 /* “First / Last” headers */
 .daily-grid .dg-hcell,
 .daily-grid .dg-gradebar { font-size: 10px; padding: 5px 2px; }
-
 
 /* Keep things proportionate on small screens */
 @media (max-width: 768px) {
@@ -309,7 +413,106 @@
   .daily-grid { --cell-size: 64px; }
   .daily-grid .dg-hcell,
   .daily-grid .dg-cell,
-  .daily
+  .daily-grid .dg-gradebar { font-size: 12px; }
+}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/* Make panes a positioning context so we can pin the indicator */
+.pane { position: relative; }
+
+/* Live indicator */
+.live-indicator{
+  position: absolute;
+  top: 6px; left: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  pointer-events: none;
+  --indicator-color: #9aa3af; /* default (idle) */
+}
+
+.live-indicator .live-dot{
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--indicator-color);
+  box-shadow: 0 0 0 0 rgba(0,0,0,0);
+  position: relative;
+}
+
+.live-indicator .live-label{
+  font-size: 10px;
+  color: #718096;
+  user-select: none;
+}
+
+/* States */
+.live-indicator.is-idle      { --indicator-color: #a0aec0; }
+.live-indicator.is-ok        { --indicator-color: #2ea043; }
+.live-indicator.is-error     { --indicator-color: #d73a49; }
+.live-indicator.is-busy      { --indicator-color: #2ea043; }
+
+/* Busy spinner ring */
+.live-indicator.is-busy .live-dot::after{
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 2px solid rgba(46,164,79,.45);
+  border-top-color: transparent;
+  animation: spin .7s linear infinite;
+}
+
+/* Green pulse after a successful call */
+.live-indicator.is-ok .live-dot{
+  animation: pulse-ok 1.6s ease-in-out infinite;
+}
+
+/* Red pulse on error */
+.live-indicator.is-error .live-dot{
+  animation: pulse-error 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse-ok {
+  0%   { box-shadow: 0 0 0 0 rgba(46,164,79,.4); }
+  70%  { box-shadow: 0 0 0 6px rgba(46,164,79,0); }
+  100% { box-shadow: 0 0 0 0 rgba(46,164,79,0); }
+}
+@keyframes pulse-error {
+  0%   { box-shadow: 0 0 0 0 rgba(215,58,73,.45); }
+  50%  { box-shadow: 0 0 0 6px rgba(215,58,73,0); }
+  100% { box-shadow: 0 0 0 0 rgba(215,58,73,0); }
+}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -334,24 +537,7 @@
       </div>
 
       <div class="form-group">
-        <label for="classes">Classes:</label>
-        <select id="classes" class="form-select" onchange="loadStudents()">
-          <option value="" disabled selected>Select Class</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="nid" >NID:</label>
-        <input type="text" class="form-control" id="nid" readonly >
-      </div>
-
-      <div class="form-group">
-        <label for="staffName" >Staff Name:</label>
-        <input type="text" class="form-control" id="staffName" readonly >
-      </div>
-
-      <div class="form-group">
-        <label for="session">Select Session:</label>
+        <label for="session">Sessions:</label>
         <select id="session" name="session" class="form-select" required>
           <option value="" disabled selected>Select Session</option>
           <option>Morning Session</option>
@@ -359,10 +545,31 @@
         </select>
       </div>
 
+
+
+      <div class="form-group">
+        <label for="classes">Classes:</label>
+        <select id="classes" class="form-select">
+          <option value="" disabled selected>Select Class</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="nid" hidden>NID:</label>
+        <input type="text" class="form-control" id="nid" readonly hidden >
+      </div>
+
+      <div class="form-group">
+        <label for="staffName" >Staff Name:</label>
+        <input type="text" class="form-control" id="staffName" readonly >
+      </div>
+
+
+
       <div class="form-group">
         <label for="period">Observed Period:</label>
         <select id="period" name="period" class="form-select" required>
-          <option value="" disabled selected>Select Observation Period</option>
+          <option value="" disabled selected>Select Period</option>
           <option>First Period</option>
           <option>Last Period</option>
         </select>
@@ -428,14 +635,14 @@
 
         <div class="form-group">
           <label for="grade" style="font-size: 12px;">Grade:</label>
-          <select id="grade" name="grade" class="form-select" required style="font-size: 12px; padding: 4px 8px; height: 32px;">
+          <select id="grade" name="grade" class="form-select" required style="font-size: 12px; padding: 4px 8px; height: 32px; width:140px;">
             <option value="" disabled selected >Select Grade</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="session2" style="font-size: 12px;">Select Session:</label>
-          <select id="session2" name="session2" class="form-select" required style="font-size: 12px; padding: 4px 8px; height: 32px;">
+          <select id="session2" name="session2" class="form-select" required style="font-size: 12px; padding: 4px 8px; height: 32px; width:140px;">
             <option value="" disabled selected >Select Session</option>
             <option>Morning Session</option>
             <option>Afternoon Session</option>
@@ -453,6 +660,47 @@
   <div class="developer-credit">Developed by: Mifthah Ahmed</div>
 
   <script>
+   
+   
+   /* Toggle visibility here — Mifu this is the part to add or remove classes dont forget mi part you dummy*/
+const HIDDEN_CLASSES = new Set([
+  '10S5', // hidden for this year 2025
+  '10B5',
+  '9S5',
+  '9B5',
+  '1H',
+  '1I',
+  '1J',
+  '2H',
+  '2I',
+  '2J',
+  '3G',
+  '3H',
+  '3I',
+  '3J',
+  '5H',
+  '5I',
+  '5J', 
+  '6H',
+  '6I',
+  '6J',   
+  '7J',   
+  '8I',
+  '8J',  
+  // '9B3', // example: mi gothah add kuraani for next classes you want. just make it a comment hide kuranya. its easy nu
+]);
+
+
+function isHidden(code){
+  if (HIDDEN_CLASSES.has(code)) return true;
+  // Mifu you can do mi gothah if its for a year but i wundt dare adhi. mi gothah mi liyunee as you might forgot after some week. code starts from this ingey >> if (HIDE_UNTIL_YEAR[code]) return (new Date().getFullYear() < HIDE_UNTIL_YEAR[code]);
+  return false;
+}
+     //  OOh and i putted (renderOptions) ah ves mi hide kuraa goi. you can check it ingeyne fenuneema. ebai u cant forget.
+   
+   
+   
+   
    
     function todayYMD(){
       const d = new Date();
@@ -523,16 +771,17 @@
       }
 
       function renderOptions(codes) {
-        const prev = classSelect.value;
-        classSelect.innerHTML = '<option value="" disabled selected>Select Class</option>';
-        codes.forEach(code => {
-          const opt = document.createElement('option');
-          opt.value = code;
-          opt.textContent = code;
-          classSelect.appendChild(opt);
-        });
-        if (codes.includes(prev)) classSelect.value = prev;
-      }
+  const prev = classSelect.value;
+  classSelect.innerHTML = '<option value="" disabled selected>Select Class</option>';
+  codes.forEach(code => {
+    if (isHidden(code)) return;          // ⬅️ Mi that part to hide form combo box
+    const opt = document.createElement('option');
+    opt.value = code;
+    opt.textContent = code;
+    classSelect.appendChild(opt);
+  });
+  if (codes.includes(prev) && !isHidden(prev)) classSelect.value = prev;
+}
 
       function computeAndRender() {
         const sVal = (sessionSelect.value || '').trim().toLowerCase();
@@ -604,11 +853,14 @@
       html += '</div>';
       wrap.innerHTML = html;
 
-      function cellHTML(code, per){
-        return `<button type="button" class="dg-cell" data-code="${code}" data-per="${per}" aria-label="${code} ${per}">
-                  <span class="dg-code">${code}</span>
-                </button>`;
-      }
+function cellHTML(code, per){
+  if (isHidden(code)){
+    return `<div class="dg-cell is-hidden" data-code="${code}" data-per="${per}" aria-hidden="true"></div>`;
+  }
+  return `<button type="button" class="dg-cell" data-code="${code}" data-per="${per}" aria-label="${code} ${per}">
+            <span class="dg-code">${code}</span>
+          </button>`;
+}
     }
 
     // Update status styling for classn n period
@@ -781,11 +1033,7 @@
       setTimeout(() => { window.location.href = url; }, 300);
     }
 
-    function loadStudents(){  }
-	
-	
-	
-	
+
 	
 	
 	
@@ -896,8 +1144,11 @@
 	
 	
   </script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js">
+  
+  // dont remove mi part. this is for the bootstrap you took.
+  
+   </script>
 
   <script>
 
@@ -942,27 +1193,10 @@
         .catch(error => console.error('Error recalling user name:', error));
     }
     recallUserName();
-    function recallUserName() {
-      const nid = localStorage.getItem('phoneNumber');
-      if (!nid) {
-        console.warn('No NID found to recall staff name.');
-        return;
-      }
 
-      fetch(`https://script.google.com/macros/s/AKfycbxcif2M0iA6aZS3MB-XUNRg6ifXKFFCNhwly3llzuI-005QEv0BN3mfibBK4uTDvOu8/exec?action=getUserDetails&nid=${nid}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById('staffName').value = data.name;
-          } else {
-            console.error('Failed to get staff name:', data.message);
-          }
-        })
-        .catch(error => console.error('Error recalling user name:', error));
-    }
 
  
-    const cpsScriptUrl = 'https://script.google.com/macros/s/AKfycbyMN2rWs1w2BsQU_sAYO2V6OoHAJD5m40PclCf-xN0F3datjop7rZ12OcVrSz63tKkuHA/exec';
+    const cpsScriptUrl = 'https://script.google.com/macros/s/AKfycbyJl9SoybgOwTT8lv3749stCkqfes0weJugtf2mQy205RX3kOwFfH1ZKNRKCN-BH3rJQQ/exec';
 
     // Helpers
     function getChecklistState(){
@@ -1290,7 +1524,7 @@
           <td>${safeClass}</td>
           <td>${safePeriod}</td>
           <td>
-            <button class="btn btn-sm btn-outline-danger btn-delete" data-row="${rowId}">Delete</button>
+            <button class="btn btn-sm btn-outline-danger btn-delete" data-row="${rowId}" style="font-size: 10px;">Delete</button>
           </td>
         </tr>`;
     }).join('');
@@ -1331,6 +1565,115 @@
       }
     });
   </script>
+
+
+
+
+<script>
+/* Network Activity Indicator — tracks all fetch() calls */
+(function(){
+  // Create indicator in a pane. Pass '.pane-right' or '.pane-left'
+  function mountIndicator(containerSelector, labelText = 'live'){
+    const container = document.querySelector(containerSelector);
+    if(!container) return null;
+
+    const el = document.createElement('div');
+    el.className = 'live-indicator is-idle';
+    el.setAttribute('aria-live','polite');
+    el.innerHTML = '<span class="live-dot" aria-hidden="true"></span>' +
+                   `<span class="live-label">${labelText}</span>`;
+    // Pin at top-left
+    container.prepend(el);
+    return el;
+  }
+
+  // State manager
+  function makeController(el){
+    let inflight = 0;
+    let lastOKAt = 0;
+    let idleTimer = null;
+
+    function setState(s){
+      el.classList.remove('is-idle','is-busy','is-ok','is-error');
+      el.classList.add('is-' + s);
+    }
+    function scheduleIdle(){
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        if (inflight === 0 && Date.now() - lastOKAt > 5000) setState('idle');
+      }, 5000);
+    }
+
+    return {
+      start(){ inflight++; setState('busy'); },
+      ok(){
+        inflight = Math.max(0, inflight - 1);
+        lastOKAt = Date.now();
+        if (inflight === 0) { setState('ok'); scheduleIdle(); }
+      },
+      fail(){
+        inflight = Math.max(0, inflight - 1);
+        setState('error');
+        // fall back to idle after a moment if nothing else is happening
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => { if (inflight === 0) setState('idle'); }, 4000);
+      }
+    };
+  }
+
+  // Mount on the RIGHT panel (change selector if you want left)
+  const indRight = mountIndicator('.pane-right', 'live');
+  // (Optional) also on left:
+  // const indLeft  = mountIndicator('.pane-left', 'live');
+
+  // If no indicator found, abort
+  if(!indRight /* && !indLeft */) return;
+
+  const ctrlRight = indRight && makeController(indRight);
+  // const ctrlLeft  = indLeft  && makeController(indLeft);
+
+  // Helper to notify all controllers we have
+  function startAll(){ ctrlRight && ctrlRight.start(); /* ctrlLeft && ctrlLeft.start(); */ }
+  function okAll(){    ctrlRight && ctrlRight.ok();    /* ctrlLeft  && ctrlLeft.ok();    */ }
+  function failAll(){  ctrlRight && ctrlRight.fail();  /* ctrlLeft  && ctrlLeft.fail();  */ }
+
+  // Wrap fetch() once
+  if (!window.fetch.__withIndicator){
+    const _fetch = window.fetch.bind(window);
+    window.fetch = function(input, init){
+      // You can scope tracking to your script domain if you want:
+      // const url = (typeof input === 'string') ? input : (input && input.url) || '';
+      // if (!/script\.googleusercontent\.com|googleapis\.com/.test(url)) { return _fetch(input, init); }
+
+      startAll();
+      return _fetch(input, init)
+        .then(resp => { (resp.ok ? okAll : failAll)(); return resp; },
+              err  => { failAll(); throw err; })
+        .catch(err => { failAll(); throw err; }); // extra safety
+    };
+    window.fetch.__withIndicator = true;
+  }
+
+  // (Optional) reflect browser online/offline quickly
+  window.addEventListener('online',  () => okAll());
+  window.addEventListener('offline', () => failAll());
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   <!-- Details Modal -->
   <div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
