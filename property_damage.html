@@ -182,7 +182,108 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 </style>
-  
+  <style>
+/* ===== View Panel (toolbar) ===== */
+.view-panel { background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+.vp-toolbar { 
+  background: linear-gradient(135deg, #f1faf5, #eef7ff);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  position: sticky; top: 0; z-index: 3;
+}
+.vp-type { min-width: 240px; }
+
+/* ===== Grid ===== */
+.vp-grid-wrap { max-height: 58vh; overflow: auto; }
+.vp-grid { display: grid; gap: 0; }
+.vp-grid-row { 
+  display: grid; grid-template-columns: 1.1fr 1fr .9fr 1.2fr; 
+  align-items: center; min-height: 52px; border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.vp-grid-row--head { 
+  position: sticky; top: 0; background: #f7fbff; 
+  border-bottom: 1px solid rgba(0,0,0,.1); z-index: 2; font-weight: 600;
+}
+.vp-cell { padding: .8rem 1rem; }
+.vp-grid-body .vp-grid-row { 
+  cursor: pointer; transition: background .2s ease, transform .06s ease;
+}
+.vp-grid-body .vp-grid-row:hover { background: #f7fff9; }
+.vp-grid-body .vp-grid-row:active { transform: scale(.998); }
+
+/* Skeleton rows */
+.vp-skel { position: relative; overflow: hidden; color: transparent !important; }
+.vp-skel::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0,0,0,0), rgba(0,0,0,.05), rgba(0,0,0,0));
+  animation: vpShimmer 1.2s infinite; 
+}
+@keyframes vpShimmer { from { transform: translateX(-100%);} to { transform: translateX(100%);} }
+
+/* ===== Lightbox / Slideshow ===== */
+.vp-lightbox {
+  position: fixed; inset: 0; background: rgba(0,0,0,.9);
+  display: none; align-items: center; justify-content: center; flex-direction: column;
+  z-index: 9999;
+}
+.vp-lightbox[aria-hidden="false"] { display: flex; }
+
+.vp-stage { 
+  max-width: min(92vw, 1400px); max-height: 82vh; width: 100%; 
+  display: grid; place-items: center; position: relative; outline: none;
+}
+.vp-stage img { 
+  max-width: 100%; max-height: 82vh; object-fit: contain; border-radius: 10px; 
+  box-shadow: 0 10px 32px rgba(0,0,0,.35);
+}
+
+.vp-counter { 
+  position: absolute; top: 10px; left: 10px; 
+  background: rgba(0,0,0,.4); padding: .25rem .55rem; border-radius: 6px; font-size: .85rem; color: #fff;
+}
+.vp-caption { 
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.45); color: #fff; padding: .35rem .6rem; border-radius: 6px; font-size: .85rem;
+  max-width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.vp-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.18);
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 26px; user-select: none; cursor: pointer; transition: background .2s ease, transform .06s ease;
+}
+.vp-prev { left: clamp(10px, 4vw, 45px); }
+.vp-next { right: clamp(10px, 4vw, 45px); }
+.vp-nav:hover { background: rgba(255,255,255,.18); }
+.vp-nav:active { transform: translateY(-50%) scale(.98); }
+
+.vp-actions {
+  position: absolute; bottom: 20px; right: clamp(10px, 4vw, 45px); 
+  display: flex; gap: .5rem;
+}
+
+.vp-close {
+  position: absolute; top: 10px; right: 10px; 
+  width: 40px; height: 40px; border-radius: 50%;
+  border: none; color: #fff; background: rgba(255,255,255,.12);
+  font-size: 26px; cursor: pointer; display: grid; place-items: center;
+  transition: background .2s ease, transform .06s ease;
+}
+.vp-close:hover { background: rgba(255,255,255,.2); }
+.vp-close:active { transform: scale(.98); }
+
+/* Small screens */
+@media (max-width: 640px) {
+  .vp-grid-row { grid-template-columns: 1fr 1fr .9fr 1fr; }
+  .vp-nav { width: 42px; height: 42px; font-size: 22px; }
+}
+
+
+#viewPanel[hidden] { display: none !important; }
+[inert] { pointer-events: none; user-select: none; }
+
+
+</style>
   
 </head>
 <body>
@@ -304,90 +405,66 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <!-- Filter & View Panel -->
-<div id="viewPanel" style="display: none;" class="border p-3 rounded bg-light">
-  <h5 class="mb-3">View Submitted Reports</h5>
+<div id="viewPanel" class="view-panel border-0 p-0 rounded-4" hidden>
+  <div class="vp-toolbar d-flex flex-wrap align-items-center gap-2 p-3">
+    <label for="vpType" class="me-2 fw-semibold">Report Type</label>
+	    <div class="ms-auto small text-muted" id="vpMeta"></div>
+    <select id="vpType" class="form-select vp-type">
+      <option value="">— Select type —</option>
+      <option value="Property Damage">Property Damage</option>
+      <option value="Graffiti">Graffiti</option>
+      <option value="Littering">Littering</option>
+      <option value="Tampering">Tampering</option>
+    </select>
+    <div class="flex-grow-1 d-flex justify-content-center" >
+    <button id="vpSearch" class="btn btn-primary" hidden>Search</button>
+  </div>
+
+
   
-  <div class="row g-3 mb-3">
-    <div class="col-md-4">
-      <label for="filterDate" class="form-label">Date</label>
-      <input type="date" id="filterDate" class="form-control">
-    </div>
-    <div class="col-md-4">
-      <label for="filterType" class="form-label">Report Type</label>
-      <select id="filterType" class="form-select">
-        <option value="">All</option>
-        <option value="Property Damage">Property Damage</option>
-        <option value="Graffiti">Graffiti</option>
-        <option value="Littering">Littering</option>
-        <option value="Tampering">Tampering</option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <label for="filterStaff" class="form-label">Reported Staff NID</label>
-      <input type="text" id="filterStaff" class="form-control">
-    </div>
-<div class="col-md-4">
-  <label>Location</label>
-  <input list="location-options" id="location" class="form-control" required>
-  <datalist id="location-options">
-    <!-- Grade 1 to 8: A–Z -->
-    <option value="1A"><option value="1B"><option value="1C"><option value="1D"><option value="1E"><option value="1F"><option value="1G"><option value="1H"><option value="1I"><option value="1J"><option value="1K"><option value="1L"><option value="1M"><option value="1N"><option value="1O"><option value="1P"><option value="1Q"><option value="1R"><option value="1S"><option value="1T"><option value="1U"><option value="1V"><option value="1W"><option value="1X"><option value="1Y"><option value="1Z">
-    <option value="2A"><option value="2B"><option value="2C"><option value="2D"><option value="2E"><option value="2F"><option value="2G"><option value="2H"><option value="2I"><option value="2J"><option value="2K"><option value="2L"><option value="2M"><option value="2N"><option value="2O"><option value="2P"><option value="2Q"><option value="2R"><option value="2S"><option value="2T"><option value="2U"><option value="2V"><option value="2W"><option value="2X"><option value="2Y"><option value="2Z">
-    <option value="3A"><option value="3B"><option value="3C"><option value="3D"><option value="3E"><option value="3F"><option value="3G"><option value="3H"><option value="3I"><option value="3J"><option value="3K"><option value="3L"><option value="3M"><option value="3N"><option value="3O"><option value="3P"><option value="3Q"><option value="3R"><option value="3S"><option value="3T"><option value="3U"><option value="3V"><option value="3W"><option value="3X"><option value="3Y"><option value="3Z">
-    <option value="4A"><option value="4B"><option value="4C"><option value="4D"><option value="4E"><option value="4F"><option value="4G"><option value="4H"><option value="4I"><option value="4J"><option value="4K"><option value="4L"><option value="4M"><option value="4N"><option value="4O"><option value="4P"><option value="4Q"><option value="4R"><option value="4S"><option value="4T"><option value="4U"><option value="4V"><option value="4W"><option value="4X"><option value="4Y"><option value="4Z">
-    <option value="5A"><option value="5B"><option value="5C"><option value="5D"><option value="5E"><option value="5F"><option value="5G"><option value="5H"><option value="5I"><option value="5J"><option value="5K"><option value="5L"><option value="5M"><option value="5N"><option value="5O"><option value="5P"><option value="5Q"><option value="5R"><option value="5S"><option value="5T"><option value="5U"><option value="5V"><option value="5W"><option value="5X"><option value="5Y"><option value="5Z">
-    <option value="6A"><option value="6B"><option value="6C"><option value="6D"><option value="6E"><option value="6F"><option value="6G"><option value="6H"><option value="6I"><option value="6J"><option value="6K"><option value="6L"><option value="6M"><option value="6N"><option value="6O"><option value="6P"><option value="6Q"><option value="6R"><option value="6S"><option value="6T"><option value="6U"><option value="6V"><option value="6W"><option value="6X"><option value="6Y"><option value="6Z">
-    <option value="7A"><option value="7B"><option value="7C"><option value="7D"><option value="7E"><option value="7F"><option value="7G"><option value="7H"><option value="7I"><option value="7J"><option value="7K"><option value="7L"><option value="7M"><option value="7N"><option value="7O"><option value="7P"><option value="7Q"><option value="7R"><option value="7S"><option value="7T"><option value="7U"><option value="7V"><option value="7W"><option value="7X"><option value="7Y"><option value="7Z">
-    <option value="8A"><option value="8B"><option value="8C"><option value="8D"><option value="8E"><option value="8F"><option value="8G"><option value="8H"><option value="8I"><option value="8J"><option value="8K"><option value="8L"><option value="8M"><option value="8N"><option value="8O"><option value="8P"><option value="8Q"><option value="8R"><option value="8S"><option value="8T"><option value="8U"><option value="8V"><option value="8W"><option value="8X"><option value="8Y"><option value="8Z">
-
-    <!-- Grade 9 -->
-    <option value="9S1"><option value="9S2"><option value="9S3"><option value="9S4"><option value="9S5"><option value="9S6"><option value="9S7">
-    <option value="9B1"><option value="9B2"><option value="9B3"><option value="9B4"><option value="9B5"><option value="9B6"><option value="9B7">
-
-    <!-- Grade 10 -->
-    <option value="10S1"><option value="10S2"><option value="10S3"><option value="10S4"><option value="10S5"><option value="10S6"><option value="10S7">
-    <option value="10B1"><option value="10B2"><option value="10B3"><option value="10B4"><option value="10B5"><option value="10B6"><option value="10B7">
-
-    <!-- Extra Rooms -->
-    <option value="AV Room">
-    <option value="Conference Room">
-    <option value="Meeting Room 2">
-    <option value="Hall">
-    <option value="Staff Room (Secondary)">
-    <option value="Staff Room (Primary)">
-    <option value="LT Room">
-  </datalist>
-</div>
-    <div class="col-md-6">
-      <label for="filterSuspect" class="form-label">Suspect</label>
-      <input type="text" id="filterSuspect" class="form-control">
-    </div>
   </div>
 
-  <div class="text-center">
-    <button class="btn btn-primary" onclick="searchFilteredReports()">Search</button>
-  </div>
-
-  <div class="mt-4" id="filterResults">
-    <!-- Filtered images or reports will be displayed here -->
-  </div>
-  
-
- <!-- Bootstrap Modal for full-screen image preview -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-fullscreen"> <!-- Fullscreen modal -->
-    <div class="modal-content bg-dark text-white border-0">
-      <div class="modal-header border-0">
-        <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+  <!-- Grid (sticky header) -->
+  <div class="vp-grid-wrap">
+    <div class="vp-grid" role="table" aria-label="Filtered Reports">
+      <div class="vp-grid-header" role="rowgroup">
+        <div class="vp-grid-row vp-grid-row--head" role="row">
+          <div class="vp-cell" role="columnheader">Reported Date</div>
+          <div class="vp-cell" role="columnheader">Location</div>
+          <div class="vp-cell" role="columnheader">Suspect</div>
+          <div class="vp-cell" role="columnheader">Reported Staff</div>
+        </div>
       </div>
-      <div class="modal-body d-flex justify-content-center align-items-center p-0">
-        <img id="modalImage" src="" alt="Preview" class="img-fluid w-100 h-auto" style="object-fit: contain; max-height: 100vh;">
+      <div class="vp-grid-body" role="rowgroup" id="vpGridBody">
+        <!-- rows injected here -->
       </div>
     </div>
   </div>
 </div>
+
+<!-- Lightbox / Slideshow -->
+
+<div id="vpLightbox"
+     class="vp-lightbox"
+     role="dialog"
+     aria-modal="true"
+     aria-hidden="true">
+  <button class="vp-close" id="vpClose" aria-label="Close viewer">&times;</button>
+
+  <div class="vp-stage" id="vpStage" tabindex="0" aria-live="polite" aria-label="Image slideshow">
+    <img id="vpSlide" alt="Report image" />
+    <div class="vp-counter" id="vpCounter">1 / 1</div>
+    <div class="vp-caption" id="vpCaption"></div>
   </div>
+
+  <!-- navigation -->
+  <button class="vp-nav vp-prev" id="vpPrev" aria-label="Previous image">&#10094;</button>
+  <button class="vp-nav vp-next" id="vpNext" aria-label="Next image">&#10095;</button>
+
+
+</div>
+
+
 
 
     <div class="developer-credit text-center my-4">Developed by: Mifthah Ahmed</div>
@@ -790,120 +867,376 @@ removeBtn.addEventListener('click', () => {
 
 
 <script>
-document.getElementById('toggleViewPanel').addEventListener('click', function () {
-  const isPanelVisible = document.getElementById('viewPanel').style.display === 'block';
+const viewPanel = document.getElementById('viewPanel');
+const toggleBtn = document.getElementById('toggleViewPanel');
+const vpClosePanel = document.getElementById('vpClosePanel');
 
-  // Toggle visibility of form and log
-  document.getElementById('reportForm').style.display = isPanelVisible ? 'block' : 'none';
-  document.getElementById('submitBtn').style.display = isPanelVisible ? 'inline-block' : 'none';
-  document.querySelector('[onclick="clearForm()"]').style.display = isPanelVisible ? 'inline-block' : 'none';
-  document.querySelector('[onclick^="navigateToLandingPage"]').style.display = isPanelVisible ? 'inline-block' : 'none';
-  document.querySelector('h5').style.display = isPanelVisible ? 'block' : 'none';
-  document.getElementById('reportGrid').parentElement.parentElement.style.display = isPanelVisible ? 'block' : 'none';
+// Optional: give your log section an id for easy toggling
+// <div class="mt-5" id="myReportsSection">…</div>
+const formEl = document.getElementById('reportForm');
+const submitBtn = document.getElementById('submitBtn');
+const clearBtn = document.querySelector('[onclick="clearForm()"]');
+const backBtn = document.querySelector('[onclick^="navigateToLandingPage"]');
+const myReportsSection = document.getElementById('myReportsSection') 
+  || document.querySelector('.mt-5'); // fallback to first .mt-5 block
 
-  // Toggle view panel
-  document.getElementById('viewPanel').style.display = isPanelVisible ? 'none' : 'block';
+function showPanel() {
+  viewPanel.hidden = false;
+  toggleBtn.textContent = 'Close view panel';
 
-  // Change button text
-  this.textContent = isPanelVisible ? 'View panel' : 'Close view panel';
+  // hide main form + my reports
+  if (formEl) formEl.style.display = 'none';
+  if (submitBtn) submitBtn.style.display = 'none';
+  if (clearBtn) clearBtn.style.display = 'none';
+  if (backBtn) backBtn.style.display = 'none';
+  if (myReportsSection) myReportsSection.style.display = 'none';
+}
+
+function hidePanel() {
+  viewPanel.hidden = true;
+  toggleBtn.textContent = 'View panel';
+
+  // show main form + my reports
+  if (formEl) formEl.style.display = 'block';
+  if (submitBtn) submitBtn.style.display = 'inline-block';
+  if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (backBtn) backBtn.style.display = 'inline-block';
+  if (myReportsSection) myReportsSection.style.display = 'block';
+}
+
+// Top button toggles open/close
+toggleBtn.addEventListener('click', () => {
+  if (viewPanel.hidden) showPanel(); else hidePanel();
 });
 
-// Placeholder for filter search
-function searchFilteredReports() {
-  const date = document.getElementById('filterDate').value;
-  const type = document.getElementById('filterType').value;
-  const staff = document.getElementById('filterStaff').value.trim();
-  const location = document.getElementById('filterLocation').value.trim();
-  const suspect = document.getElementById('filterSuspect').value.trim();
 
-  // Placeholder HTML
-  const resultsDiv = document.getElementById('filterResults');
-  resultsDiv.innerHTML = `<p class="text-muted">Filtering reports by:</p>
-    <ul>
-      ${date ? `<li><strong>Date:</strong> ${date}</li>` : ''}
-      ${type ? `<li><strong>Type:</strong> ${type}</li>` : ''}
-      ${staff ? `<li><strong>Staff NID:</strong> ${staff}</li>` : ''}
-      ${location ? `<li><strong>Location:</strong> ${location}</li>` : ''}
-      ${suspect ? `<li><strong>Suspect:</strong> ${suspect}</li>` : ''}
-    </ul>
-    <p><em>Implement your filtering logic here to load and display matching report images.</em></p>`;
-}
+// Also allow Escape key to close
+document.addEventListener('keydown', (e) => {
+  if (!viewPanel.hidden && e.key === 'Escape') hidePanel();
+});
+
+// Ensure hidden on initial load (in case HTML got cached without the hidden attribute)
+document.addEventListener('DOMContentLoaded', () => { viewPanel.hidden = true; });
 </script>
 
 
 
 <script>
-function searchFilteredReports() {
-  const date = document.getElementById('filterDate').value;
-  const type = document.getElementById('filterType').value;
-  const nid = document.getElementById('filterStaff').value.trim();
-  const location = document.getElementById('filterLocation').value.trim();
-  const suspect = document.getElementById('filterSuspect').value.trim();
+// ========================== CONFIG ==========================
+const API_BASE = 'https://script.google.com/macros/s/AKfycbz2JG_zy4z07b1Y-QmnrbFmOkjpmiAXSZMGvpHTkNDGrHVBf1NU7h2zzF_SJq6wL3RrMA/exec';
+// ============================================================
 
-  const params = new URLSearchParams({
-    action: 'getReports',
-    date,
-    type,
-    nid,
-    location,
-    suspect
+// Cache DOM
+const vpType = document.getElementById('vpType');
+const vpSearch = document.getElementById('vpSearch');
+const vpMeta = document.getElementById('vpMeta');
+const vpGridBody = document.getElementById('vpGridBody');
+
+// Lightbox elements
+const lb = document.getElementById('vpLightbox');
+const lbStage = document.getElementById('vpStage');
+const lbImg = document.getElementById('vpSlide');
+const lbPrev = document.getElementById('vpPrev');
+const lbNext = document.getElementById('vpNext');
+const lbClose = document.getElementById('vpClose');
+const lbCounter = document.getElementById('vpCounter');
+const lbCaption = document.getElementById('vpCaption');
+const lbPlayPause = document.getElementById('vpPlayPause');
+const lbFull = document.getElementById('vpFullscreen');
+
+// State
+let currentSlides = [];
+let currentIndex = 0;
+let autoTimer = null;
+
+// ---------- Utilities ----------
+// Replace your fmt.date with this:
+const fmt = {
+  date: (d) => {
+    if (!d) return '';
+
+    // If it's already a Date from Apps Script
+    if (d instanceof Date) {
+      try { return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(d); }
+      catch { return d.toDateString(); }
+    }
+
+    // If it’s a number (serial)
+    if (typeof d === 'number' && isFinite(d)) {
+      // Google/Excel serial: days since 1899-12-30
+      const base = new Date(1899, 11, 30);
+      base.setDate(base.getDate() + d);
+      return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(base);
+    }
+
+    if (typeof d === 'string') {
+      const s = d.trim();
+
+      // YYYY-MM-DD => build with year, month-1, day to avoid timezone quirks
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
+      if (m) {
+        const dt = new Date(+m[1], +m[2] - 1, +m[3]);
+        return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(dt);
+      }
+
+      // Try generic parse (ISO, RFC, etc.)
+      const t = Date.parse(s);
+      if (!isNaN(t)) {
+        const dt = new Date(t);
+        return new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: '2-digit' }).format(dt);
+      }
+
+      // Couldn’t parse — show raw
+      return s;
+    }
+
+    // Last resort
+    return String(d);
+  },
+
+  text: (v) => (v ?? '').toString().trim()
+};
+
+
+function makeSkeletonRows(n = 6) {
+  const frag = document.createDocumentFragment();
+  for (let i=0;i<n;i++) {
+    const row = document.createElement('div');
+    row.className = 'vp-grid-row vp-skel';
+    row.innerHTML = `<div class="vp-cell">Loading…</div>
+                     <div class="vp-cell">Loading…</div>
+                     <div class="vp-cell">Loading…</div>
+                     <div class="vp-cell">Loading…</div>`;
+    frag.appendChild(row);
+  }
+  vpGridBody.innerHTML = '';
+  vpGridBody.appendChild(frag);
+}
+
+function normalizeReport(rowObj) {
+  // Works whether backend returns header-named keys or we need to fall back to indexes
+  const vals = Object.values(rowObj);
+
+  const id = rowObj['Custom ID'] || rowObj['FileID'] || rowObj['ID'] || vals[0] || '';
+  const date = rowObj['Date'] || vals[1] || '';
+  const nid = rowObj['NID'] || rowObj['Reported Staff NID'] || vals[2] || '';
+  const staff = rowObj['Name'] || rowObj['Reported Staff Name'] || vals[3] || '';
+  const location = rowObj['Location'] || vals[4] || '';
+  const type = rowObj['Type'] || rowObj['Report Type'] || vals[5] || '';
+  const suspect = rowObj['Suspect'] || vals[6] || '';
+
+  // Images: columns H-L => indexes 7..11
+  const images = [];
+  for (let i=7;i<=11;i++) {
+    const url = vals[i];
+    if (url && typeof url === 'string' && url.trim().length > 0) images.push(url.trim());
+  }
+
+  return { id, date, nid, staff, location, type, suspect, images };
+}
+
+function buildGrid(items) {
+  const frag = document.createDocumentFragment();
+  items.forEach((it, idx) => {
+    const row = document.createElement('div');
+    row.className = 'vp-grid-row';
+    row.setAttribute('role', 'row');
+    row.tabIndex = 0;
+
+    row.innerHTML = `
+      <div class="vp-cell" role="cell">${fmt.date(it.date)}</div>
+      <div class="vp-cell" role="cell">${fmt.text(it.location) || '-'}</div>
+      <div class="vp-cell" role="cell">${fmt.text(it.suspect) || '-'}</div>
+      <div class="vp-cell" role="cell">${fmt.text(it.staff) || '-'}</div>
+    `;
+
+    // click to open slideshow
+    row.addEventListener('click', () => openLightbox(it));
+    row.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(it); }
+    });
+
+    frag.appendChild(row);
   });
 
-  fetch('https://script.google.com/macros/s/AKfycbyWkSGYq-kmY6LBStaFiAOAQ95r5HKwEskdDle6CN2IFNk-hJsL1cOIKOK-lklFks7Z/exec?' + params)
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById('filterResults');
-      container.innerHTML = '';
-
-      if (data.status === 'success' && data.reports.length > 0) {
-        data.reports.forEach(report => {
-          const div = document.createElement('div');
-          div.className = 'card mb-3 shadow-sm';
-
-          let imagesHTML = '';
-          for (let i = 1; i <= 5; i++) {
-            let url = report[`Image ${i}`];
-            if (url && url.startsWith('http')) {
-              imagesHTML += `
-                <img src="${url.trim()}" 
-                     class="img-thumbnail me-2 mb-2" 
-                     style="height: 100px; cursor: pointer;" 
-                     onclick="openImageModal('${url.trim().replace(/'/g, "\\'")}')">`;
-            }
-          }
-
-          div.innerHTML = `
-            <div class="card-body">
-              <h5 class="card-title">${report['Report type']} - ${report['Location']}</h5>
-              <p class="card-text"><strong>Date:</strong> ${report['Date']}</p>
-              <p class="card-text"><strong>Reported By:</strong> ${report['Reported staff name']}</p>
-              <p class="card-text"><strong>Suspect:</strong> ${report['suspect']}</p>
-              <div class="d-flex flex-wrap">${imagesHTML || '<p class="text-muted">No images attached.</p>'}</div>
-            </div>
-          `;
-          container.appendChild(div);
-        });
-      } else {
-        container.innerHTML = '<p class="text-danger">No matching records found.</p>';
-      }
-    })
-    .catch(err => {
-      console.error('Fetch error:', err);
-      document.getElementById('filterResults').innerHTML = '<p class="text-danger">An error occurred while loading reports.</p>';
-    });
+  vpGridBody.innerHTML = '';
+  vpGridBody.appendChild(frag);
 }
 
-function openImageModal(url) {
-  const modalImage = document.getElementById('modalImage');
-  modalImage.onerror = () => {
-    window.open(url, '_blank');
+async function fetchReportsByType(typeVal) {
+  const url = new URL(API_BASE);
+  url.searchParams.set('action', 'getReports');
+  if (typeVal) url.searchParams.set('type', typeVal);
+
+  const res = await fetch(url.toString(), { method: 'GET', mode: 'cors' });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+
+  if (data.status !== 'success' || !Array.isArray(data.reports)) {
+    throw new Error('Unexpected response from server');
+  }
+  return data.reports.map(normalizeReport);
+}
+
+// ---------- Lightbox ----------
+function openLightbox(report) {
+  currentSlides = report.images.length ? report.images : [];
+  currentIndex = 0;
+
+  // Caption shows basic metadata
+  lbCaption.textContent = `${report.id || ''}  •  ${fmt.date(report.date)}  •  ${report.location || ''}`;
+  if (!currentSlides.length) {
+    // No images => show an empty frame with message
+    lbImg.removeAttribute('src');
+    lbImg.setAttribute('alt', 'No images attached to this report');
+    lbCounter.textContent = `0 / 0`;
+  } else {
+    showSlide(0);
+  }
+
+  lb.setAttribute('aria-hidden', 'false');
+  lbStage.focus();
+
+  // Allow swipe / drag
+  enableSwipe(lbStage, () => next(), () => prev());
+}
+
+let lastFocusEl = null;
+
+function setBackgroundInert(state) {
+  // Inert everything except the lightbox to keep focus trapped
+  [...document.body.children].forEach(el => {
+    if (el === lb) return;
+    if (state) el.setAttribute('inert', '');
+    else el.removeAttribute('inert');
+  });
+}
+
+function openLightbox(report) {
+  currentSlides = report.images.length ? report.images : [];
+  currentIndex = 0;
+
+  // remember where to return focus to
+  lastFocusEl = document.activeElement;
+
+  // show & prepare UI
+  lb.setAttribute('aria-hidden', 'false');
+  lbCaption.textContent = `${report.id || ''}  •  ${fmt.date(report.date)}  •  ${report.location || ''}`;
+  if (currentSlides.length) { showSlide(0); }
+  else {
+    lbImg.removeAttribute('src');
+    lbImg.alt = 'No images attached to this report';
+    lbCounter.textContent = '0 / 0';
+  }
+
+  // trap focus in the dialog by disabling the rest
+  setBackgroundInert(true);
+
+  // move focus into the lightbox
+  requestAnimationFrame(() => (lbStage.focus()));
+}
+
+function closeLightbox() {
+
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+
+
+  const returnEl = (lastFocusEl && document.contains(lastFocusEl))
+    ? lastFocusEl
+    : document.getElementById('toggleViewPanel'); // fallback
+  returnEl?.focus();
+
+  // clear any focused element inside the lightbox (belt & suspenders)
+  lbStage.blur();
+  lbClose.blur?.();
+
+  // hide the dialog
+  lb.setAttribute('aria-hidden', 'true');
+
+  // re-enable background
+  setBackgroundInert(false);
+}
+
+function showSlide(i) {
+  if (!currentSlides.length) return;
+  currentIndex = (i + currentSlides.length) % currentSlides.length;
+
+  const src = currentSlides[currentIndex];
+  lbImg.style.opacity = '0';
+  lbImg.onload = () => { lbImg.style.opacity = '1'; };
+  lbImg.src = src;
+  lbImg.alt = `Report image ${currentIndex+1}`;
+  lbCounter.textContent = `${currentIndex+1} / ${currentSlides.length}`;
+}
+
+function next() { showSlide(currentIndex + 1); }
+function prev() { showSlide(currentIndex - 1); }
+
+function toggleAuto() {
+  if (autoTimer) { stopAuto(); }
+  else {
+    lbPlayPause.textContent = 'Pause';
+    autoTimer = setInterval(next, 2500);
+  }
+}
+
+
+// swipe / drag helper
+function enableSwipe(el, onLeft, onRight) {
+  let startX = 0, tracking = false;
+  el.onpointerdown = (e) => { tracking = true; startX = e.clientX; el.setPointerCapture(e.pointerId); };
+  el.onpointerup = (e) => {
+    if (!tracking) return;
+    tracking = false;
+    const dx = e.clientX - startX;
+    if (dx < -50) onLeft();
+    else if (dx > 50) onRight();
   };
-  modalImage.src = url;
-  const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-  modal.show();
 }
-</script>
 
+// keyboard controls
+document.addEventListener('keydown', (e) => {
+  if (lb.getAttribute('aria-hidden') === 'true') return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowRight') next();
+  if (e.key === 'ArrowLeft') prev();
+  if (e.key === ' ') { e.preventDefault(); toggleAuto(); }
+});
+
+// wire buttons
+lbPrev.addEventListener('click', prev);
+lbNext.addEventListener('click', next);
+lbClose.addEventListener('click', closeLightbox);
+
+
+// ---------- Search wiring ----------
+async function runSearch() {
+  const t = vpType.value;
+  vpMeta.textContent = 'Searching…';
+  makeSkeletonRows();
+
+  try {
+    const list = await fetchReportsByType(t);
+    // sort newest first by date (safe if ISO yyyy-mm-dd)
+    list.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    buildGrid(list);
+    vpMeta.textContent = `${list.length} result${list.length===1?'':'s'}`;
+  } catch (err) {
+    vpGridBody.innerHTML = `<div class="vp-grid-row"><div class="vp-cell" style="grid-column: 1 / -1; color:#b00020;">
+      Error loading reports: ${err.message}
+    </div></div>`;
+    vpMeta.textContent = '—';
+  }
+}
+
+vpSearch.addEventListener('click', runSearch);
+vpType.addEventListener('change', () => {
+  // Optional: auto-search on change
+  runSearch();
+});
+
+// Initial paint: empty grid until user selects type (or auto-run if you prefer)
+</script>
 
 
 
