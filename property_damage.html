@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userRank = localStorage.getItem('userRank');
 
-    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR', 'PRINCIPAL'].includes(userRank)) {
         alert('You must be logged in to view this page.');
         window.location.href = 'index.html'; // Redirect to login page
     }
@@ -478,6 +478,8 @@ function navigateToLandingPage() {
     navigateWithFade('teachers_landing_page.html');
   } else if (rank === "SMT") {
     navigateWithFade('smt_landing_page.html');
+  } else if (rank === "PRINCIPAL") {
+    navigateWithFade('principal_landing_page.html');
   } else {
     alert("Access denied. Invalid rank.");
     navigateWithFade('index.html'); // Optional: redirect to login
@@ -1244,4 +1246,3 @@ vpType.addEventListener('change', () => {
 
 </body>
 </html>
-
