@@ -7,6 +7,21 @@
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 
+
+<script>
+    
+document.addEventListener('DOMContentLoaded', function () {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRank = localStorage.getItem('userRank');
+
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR', 'PRINCIPAL'].includes(userRank)) {
+        alert('You must be logged in to view this page.');
+        window.location.href = 'index.html'; // Redirect to login page
+    }
+});
+</script>
+
+
   <style>
 :root{
   --field-width: 235px;
@@ -600,7 +615,7 @@ body.fade-in  { opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
       <div class="btn-row">
         <button id="submitBtn" class="btn btn-primary" onclick="submitBehavior(event)">Submit</button>
         <button class="btn btn-secondary" onclick="clearForm()">Clear</button>
-        <button type="button" class="btn btn-danger" onclick="navigateWithFade('teachers_landing_page.html')">Back</button>
+        <button type="button" class="btn btn-danger" onclick="navigateToLandingPage()">Back</button>
       </div>
 
       <div class="mt-4">
@@ -658,9 +673,27 @@ body.fade-in  { opacity: 0; animation: fadeIn 0.5s ease-in forwards; }
   </div>
 
   <div class="developer-credit">Developed by: Mifthah Ahmed</div>
+<script>
+function navigateToLandingPage() {
+  const rank = localStorage.getItem("userRank");
 
+  if (rank === "TEACHER") {
+    navigateWithFade('teachers_landing_page.html');
+  } else if (rank === "SMT") {
+    navigateWithFade('smt_landing_page.html');
+  } else if (rank === "PRINCIPAL") {
+    navigateWithFade('principal_landing_page.html');
+  } else {
+    alert("Access denied. Invalid rank.");
+    navigateWithFade('index.html'); // Optional: redirect to login
+  }
+}
+</script>
   <script>
    
+
+
+
    
    /* Toggle visibility here — Mifu this is the part to add or remove classes dont forget mi part you dummy*/
 const HIDDEN_CLASSES = new Set([
@@ -1659,16 +1692,6 @@ function cellHTML(code, per){
   window.addEventListener('offline', () => failAll());
 })();
 </script>
-
-
-
-
-
-
-
-
-
-
 
 
 
