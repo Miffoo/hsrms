@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userRank = localStorage.getItem('userRank');
 
-    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR', 'PRINCIPAL'].includes(userRank)) {
         alert('You must be logged in to view this page.');
         window.location.href = 'index.html'; // Redirect to login page
     }
@@ -148,8 +148,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	</div>
 	<div class="mt-3">
 
-		    <button class="btn btn-danger" style="width: 100%;"  onclick="navigateWithFade('smt_landing_page.html')">Go Back</button>
+		    <button class="btn btn-danger" style="width: 100%;"  onclick="navigateToLandingPage()">Go Back</button>
 	</div>
+
+      
+	 
+
 
 <div class="progress my-3" style="height: 25px; display: none;" id="searchProgressWrapper">
   <div id="searchProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%">Searching...</div>
@@ -351,6 +355,25 @@ function clearForm() {
         }, 500); // Match the transition time
     }
 </script>
+
+
+<script>
+function navigateToLandingPage() {
+  const rank = localStorage.getItem("userRank");
+
+  if (rank === "TEACHER") {
+    navigateWithFade('teachers_landing_page.html');
+  } else if (rank === "SMT") {
+    navigateWithFade('smt_landing_page.html');
+  } else if (rank === "PRINCIPAL") {
+    navigateWithFade('principal_landing_page.html');
+  } else {
+    alert("Access denied. Invalid rank.");
+    navigateWithFade('index.html'); // Optional: redirect to login
+  }
+}
+</script>
+
 
 
 </body>
