@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userRank = localStorage.getItem('userRank');
 
-    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR', 'PRINCIPAL'].includes(userRank)) {
         alert('You must be logged in to view this page.');
         window.location.href = 'index.html'; // Redirect to login page
     }
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () {
         </div>
 
         <button class="btn btn-secondary" style="width: 100%;" onclick="clearAttendanceForm()">Clear Selection</button>
-        <button class="btn btn-danger" style="width: 100%;" onclick="navigateWithFade('smt_landing_page.html')">Go Back</button>
+        <button class="btn btn-danger" style="width: 100%;" onclick="navigateToLandingPage()">Go Back</button>
     </div>
 
     <div class="developer-credit text-center my-4">Developed by: Mifthah Ahmed</div>
@@ -275,6 +275,12 @@ generateClassOptions();
             }
         });
 });
+
+
+
+
+
+
 
 function updateStaffDetails() {
 
@@ -642,11 +648,25 @@ function saveClass(role) {
 </script>
 
 
+<script>
+function navigateToLandingPage() {
+  const rank = localStorage.getItem("userRank");
 
+  if (rank === "TEACHER") {
+    navigateWithFade('teachers_landing_page.html');
+  } else if (rank === "SMT") {
+    navigateWithFade('smt_landing_page.html');
+  } else if (rank === "PRINCIPAL") {
+    navigateWithFade('principal_landing_page.html');
+  } else {
+    alert("Access denied. Invalid rank.");
+    navigateWithFade('index.html'); // Optional: redirect to login
+  }
+}
+</script>
 
 
 
 
 </body>
 </html>
-
