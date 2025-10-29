@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     const userRank = localStorage.getItem('userRank');
 
-    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR'].includes(userRank)) {
+    if (!isLoggedIn || !['TEACHER', 'SMT', 'ADMINISTRATOR', 'PRINCIPAL'].includes(userRank)) {
         alert('You must be logged in to view this page.');
         window.location.href = 'index.html'; // Redirect to login page
     }
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	</div>
 
 	<div class="mt-2">
-      <button type="button" class="btn btn-danger w-100" onclick="navigateWithFade('smt_landing_page.html')">Back</button>
+      <button type="button" class="btn btn-danger w-100" onclick="navigateToLandingPage()">Back</button>
 	  	</div>
 	  
 	  
@@ -1172,7 +1172,22 @@ function displayStats(records) {
 
 
 
+<script>
+function navigateToLandingPage() {
+  const rank = localStorage.getItem("userRank");
 
+  if (rank === "TEACHER") {
+    navigateWithFade('teachers_landing_page.html');
+  } else if (rank === "SMT") {
+    navigateWithFade('smt_landing_page.html');
+  } else if (rank === "PRINCIPAL") {
+    navigateWithFade('principal_landing_page.html');
+  } else {
+    alert("Access denied. Invalid rank.");
+    navigateWithFade('index.html'); // Optional: redirect to login
+  }
+}
+</script>
 
 
 
